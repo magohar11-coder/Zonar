@@ -48,7 +48,7 @@
         .header-stats { display: flex; justify-content: space-between; padding: 5px 15px; font-size: 0.9rem; }
 
         .ring-container { position: relative; width: 200px; height: 200px; margin: 10px auto; display: flex; justify-content: center; align-items: center; }
-        .bead { position: absolute; width: 10px; height: 10px; background: radial-gradient(circle, #fff, var(--bead-color)); border-radius: 50%; left: 50%; top: 0; transform-origin: 50% 100px; }
+        .bead { position: absolute; width: 10px; height: 10px; background: radial-gradient(circle, #fff, var(--bead-color)); border-radius: 50%; left: 50%; top: 0; transform-origin: 50% 100px; transition: transform 0.2s; }
         .total-display { font-size: 4rem; font-weight: 100; margin: 0; z-index: 10; }
 
         .dhikr-btn { 
@@ -57,9 +57,10 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.8); cursor: pointer; 
             border: none; outline: none; display: flex; justify-content: center; align-items: center;
             margin: 0 auto 10px; -webkit-tap-highlight-color: transparent;
+            transition: transform 0.1s;
         }
 
-        .dhikr-btn:active { transform: scale(0.95); transition: 0.1s; }
+        .dhikr-btn:active { transform: scale(0.92); }
         .press-text { font-size: 1.1rem; color: #332600; font-weight: 900; pointer-events: none; }
     </style>
 </head>
@@ -86,7 +87,7 @@
 
         <div class="header-stats">
             <div>Today: <b id="todayCount">0</b><br><button class="side-btn" id="soundBtn" style="padding:2px 8px; font-size:0.6rem; margin-top:5px;">🔊 On</button></div>
-            <div>Target: <b id="targetLabel">10</b><br><button class="side-btn" id="shareBtn" style="padding:2px 8px; font-size:0.6rem; margin-top:5px;">🔗 Share</button></div>
+            <div>Target: <b id="targetLabel">100</b><br><button class="side-btn" id="shareBtn" style="padding:2px 8px; font-size:0.6rem; margin-top:5px;">🔗 Share</button></div>
         </div>
 
         <div class="ring-container">
@@ -117,21 +118,27 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // State initialization - FAST
+        // Persistent State
         let count = parseInt(localStorage.getItem('mag_count')) || 0;
-        let goal = parseInt(localStorage.getItem('mag_goal')) || 10;
+        let goal = parseInt(localStorage.getItem('mag_goal')) || 100;
         let isMuted = localStorage.getItem('mag_mute') === 'true';
 
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
+        // Audio setup
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
         function playTing() {
-            if (isMuted) return;
+            if (isMuted || !audioCtx) return;
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.frequency.value = 1200; osc.type = 'sine';
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+            osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
             osc.start(); osc.stop(audioCtx.currentTime + 0.5);
         }
 
@@ -143,52 +150,53 @@
             localStorage.setItem('mag_count', count);
         };
 
-        // Handle Tap Logic
-        document.getElementById('tapBtn').addEventListener('click', () => {
+        // Tap Logic
+        document.getElementById('tapBtn').addEventListener('pointerdown', (e) => {
+            initAudio(); // Initialize on first tap
             count++;
             updateUI();
             
-            // Vibration on every tap
-            if (navigator.vibrate) navigator.vibrate(30);
+            if (navigator.vibrate) navigator.vibrate(40);
 
-            // Target reached logic
+            // Target Logic: 3 Tings & Strong Vibration
             if (count % goal === 0) {
-                if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
-                let playCount = 0;
-                let interval = setInterval(() => {
+                if (navigator.vibrate) navigator.vibrate([150, 100, 150, 100, 150]);
+                let times = 0;
+                let bell = setInterval(() => {
                     playTing();
-                    playCount++;
-                    if (playCount >= 3) clearInterval(interval);
-                }, 300);
+                    times++;
+                    if (times >= 3) clearInterval(bell);
+                }, 250);
             }
         });
 
-        document.getElementById('resetBtn').addEventListener('click', () => {
-            if(confirm("Confirm Reset?")) {
+        document.getElementById('resetBtn').onclick = () => {
+            if(confirm("Zero se start karein?")) {
                 count = 0;
                 updateUI();
             }
-        });
+        };
 
-        document.getElementById('targetBtn').addEventListener('click', () => {
-            let g = prompt("Set Target (Current: " + goal + ")", goal);
-            if(g && !isNaN(g) && g > 0) {
-                goal = parseInt(g);
+        document.getElementById('targetBtn').onclick = () => {
+            let val = prompt("Target set karein:", goal);
+            if(val && !isNaN(val)) {
+                goal = parseInt(val);
                 localStorage.setItem('mag_goal', goal);
                 updateUI();
             }
-        });
+        };
 
-        document.getElementById('soundBtn').addEventListener('click', (e) => {
+        document.getElementById('soundBtn').onclick = (e) => {
             isMuted = !isMuted;
             localStorage.setItem('mag_mute', isMuted);
             e.target.innerText = isMuted ? '🔇 Off' : '🔊 On';
-            if (!isMuted) playTing();
-        });
+            if(!isMuted) { initAudio(); playTing(); }
+        };
 
-        document.getElementById('shareBtn').addEventListener('click', () => {
-            window.open('https://wa.me/?text=Divine Beads: Sadaqah-e-Jariyah! Join me.', '_blank');
-        });
+        document.getElementById('shareBtn').onclick = () => {
+            const link = window.location.href;
+            window.open(`https://wa.me/?text=Divine%20Beads%20App%20-%20Sadaqah-e-Jariyah!%20Start%20Dhikr%20now:%20${link}`, '_blank');
+        };
 
         // Firebase Stats
         const totalRef = ref(db, 'stats/total_users');
@@ -203,7 +211,7 @@
         onDisconnect(onlineRef).runTransaction((c) => (c > 0 ? c - 1 : 0));
         onValue(onlineRef, (s) => { document.getElementById('onlineUsers').innerText = s.val() || 1; });
 
-        // Init Mala
+        // Build Mala
         const malaWrap = document.getElementById('malaWrap');
         for (let i = 0; i < 33; i++) {
             const b = document.createElement('div');
