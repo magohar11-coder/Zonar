@@ -12,7 +12,6 @@
             --gold-glow: #f3ba2f;
             --bead-color: #ffd700;
             --text-gray: #94a3b8;
-            --neon-border: #00d2ff;
         }
 
         body {
@@ -25,8 +24,7 @@
 
         @keyframes neonBorderGlow {
             0% { border-color: #00d2ff; box-shadow: 0 0 20px #00d2ff, inset 0 0 10px #00d2ff; }
-            33% { border-color: #f3ba2f; box-shadow: 0 0 25px #f3ba2f, inset 0 0 10px #f3ba2f; }
-            66% { border-color: #ff00ff; box-shadow: 0 0 25px #ff00ff, inset 0 0 10px #ff00ff; }
+            50% { border-color: #f3ba2f; box-shadow: 0 0 25px #f3ba2f, inset 0 0 10px #f3ba2f; }
             100% { border-color: #00d2ff; box-shadow: 0 0 20px #00d2ff, inset 0 0 10px #00d2ff; }
         }
 
@@ -46,7 +44,6 @@
             color: white; padding: 8px 12px; border-radius: 12px; font-size: 0.65rem; cursor: pointer;
         }
 
-        /* FACEBOOK STYLE STATS */
         .live-stats-bar {
             background: rgba(0, 210, 255, 0.1);
             border-radius: 10px; padding: 8px; margin: 10px 0;
@@ -58,8 +55,15 @@
         .ring-container { position: relative; width: 180px; height: 180px; margin: 5px auto; display: flex; justify-content: center; align-items: center; }
         .bead { position: absolute; width: 10px; height: 10px; background: radial-gradient(circle at 30% 30%, #fff, var(--bead-color)); border-radius: 50%; left: 50%; top: 0; transform-origin: 50% 90px; }
         .total-display { font-size: 3.5rem; font-weight: 100; margin: 0; z-index: 10; color: #fff; }
-        .dhikr-btn { width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fcd34d 0%, #b28924 100%); box-shadow: 0 10px 25px rgba(0,0,0,0.6); cursor: pointer; display: flex; justify-content: center; align-items: center; margin: 5px auto; outline: none; flex-shrink: 0; }
         
+        .dhikr-btn { 
+            width: 120px; height: 120px; border-radius: 50%; 
+            background: radial-gradient(circle at 35% 35%, #fcd34d 0%, #b28924 100%); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6); cursor: pointer; 
+            display: flex; justify-content: center; align-items: center; 
+            margin: 5px auto; border: none; outline: none;
+        }
+
         @media (max-height: 600px) {
             .ring-container { width: 150px; height: 150px; }
             .bead { transform-origin: 50% 75px; }
@@ -71,8 +75,8 @@
 
     <div class="phone-frame">
         <div class="top-container">
-            <button class="side-btn" onclick="reset()">RESET</button>
-            <button class="side-btn" onclick="setGoal()">TARGET</button>
+            <button class="side-btn" id="resetBtn">RESET</button>
+            <button class="side-btn" id="targetBtn">TARGET</button>
         </div>
 
         <div class="branding-header">
@@ -81,25 +85,25 @@
         </div>
 
         <div class="live-stats-bar">
-            <span>👥 Community: <b id="totalUsers" style="color:#00d2ff">...</b></span>
-            <span>🔥 Active: <b id="onlineUsers" style="color:#f3ba2f">...</b></span>
+            <span>👥 Community: <b id="totalUsers">...</b></span>
+            <span>🔥 Active: <b id="onlineUsers">...</b></span>
         </div>
 
-        <marquee style="font-size: 0.7rem; color: var(--text-gray);">Sadaqah-e-Jariyah: Share App And earn the Reward! 100% Family Safe.</marquee>
+        <marquee style="font-size: 0.7rem; color: var(--text-gray);">Sadaqah-e-Jariyah: Share App And earn the Reward! No Adult Ads | 100% Safe.</marquee>
 
         <div class="header-stats">
             <div class="stat-col" style="text-align: left;">
-                <span>Today: <b id="todayCount" style="color:#fff">0</b></span>
-                <div class="side-btn" id="soundBtn" onclick="toggleSound()" style="padding: 3px 6px; margin-top: 5px;">🔊 On</div>
+                <span>Today: <b id="todayCount">0</b></span>
+                <div class="side-btn" id="soundBtn" style="padding: 3px 6px; margin-top: 5px;">🔊 On</div>
             </div>
             <div class="stat-col" style="text-align: right;">
-                <span>Target: <b id="targetLabel" style="color:#fff">100</b></span>
-                <div class="side-btn" onclick="shareApp()" style="padding: 3px 6px; margin-top: 5px;">🔗 Share</div>
+                <span>Target: <b id="targetLabel">100</b></span>
+                <div class="side-btn" id="shareBtn" style="padding: 3px 6px; margin-top: 5px;">🔗 Share</div>
             </div>
         </div>
 
         <div class="ring-container">
-            <div class="mala-beads-wrap" id="malaWrap" style="position: absolute; width: 100%; height: 100%; transition: transform 0.3s;"></div>
+            <div id="malaWrap" style="position: absolute; width: 100%; height: 100%; transition: transform 0.3s;"></div>
             <h1 class="total-display" id="mainCounter">0</h1>
         </div>
 
@@ -108,11 +112,10 @@
         </button>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-database-compat.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, onValue, onDisconnect, runTransaction } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
-    <script>
-        // Aapka Config jo maine set kiya hai
         const firebaseConfig = {
             apiKey: "AIzaSyCqM0KiV0K29BIFLmRoQoX2KUVdtChrwXE",
             authDomain: "divine-beads.firebaseapp.com",
@@ -124,46 +127,63 @@
             measurementId: "G-L11D16MBR7"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-        // 1. Total Installs Tracking
-        if (!localStorage.getItem('mag_user_id')) {
-            const newId = Date.now();
-            localStorage.setItem('mag_user_id', newId);
-            db.ref('stats/total_users').transaction(curr => (curr || 0) + 1);
+        // --- Community & Live Tracking ---
+        const totalRef = ref(db, 'stats/total_users');
+        const onlineRef = ref(db, 'stats/online_now');
+
+        if (!localStorage.getItem('mag_registered')) {
+            runTransaction(totalRef, (curr) => (curr || 0) + 1);
+            localStorage.setItem('mag_registered', 'true');
         }
-        db.ref('stats/total_users').on('value', s => { document.getElementById('totalUsers').innerText = s.val() || 0; });
 
-        // 2. Live Activity Tracking
-        const onlineRef = db.ref('stats/online_now');
-        onlineRef.transaction(curr => (curr || 0) + 1);
-        onlineRef.onDisconnect().transaction(curr => (curr > 0 ? curr - 1 : 0));
-        onlineRef.on('value', s => { document.getElementById('onlineUsers').innerText = s.val() || 0; });
+        onValue(totalRef, (s) => { document.getElementById('totalUsers').innerText = s.val() || 0; });
 
-        // --- PURANA APP LOGIC ---
+        runTransaction(onlineRef, (curr) => (curr || 0) + 1);
+        onDisconnect(onlineRef).runTransaction((curr) => (curr > 0 ? curr - 1 : 0));
+        onValue(onlineRef, (s) => { document.getElementById('onlineUsers').innerText = s.val() || 0; });
+
+        // --- App Logic ---
         let count = parseInt(localStorage.getItem('mag_count')) || 0;
         let goal = parseInt(localStorage.getItem('mag_goal')) || 100;
         let isMuted = localStorage.getItem('mag_mute') === 'true';
 
-        function updateUI() {
+        const updateUI = () => {
             document.getElementById('mainCounter').innerText = count;
             document.getElementById('todayCount').innerText = count;
             document.getElementById('targetLabel').innerText = goal;
             document.getElementById('malaWrap').style.transform = `rotate(-${count * (360/33)}deg)`;
             localStorage.setItem('mag_count', count);
-        }
-
-        document.getElementById('tapBtn').onclick = () => {
-            count++; updateUI();
-            if (navigator.vibrate) navigator.vibrate(50);
         };
 
-        function reset() { if(confirm("Reset?")) { count = 0; updateUI(); } }
-        function setGoal() { let g = prompt("Target:", goal); if(g) { goal = parseInt(g); updateUI(); localStorage.setItem('mag_goal', goal); } }
-        function toggleSound() { isMuted = !isMuted; localStorage.setItem('mag_mute', isMuted); document.getElementById('soundBtn').innerText = isMuted ? '🔇 Off' : '🔊 On'; }
-        function shareApp() { window.open(`https://wa.me/?text=Divine Beads App: Sadaqah-e-Jariyah!`, '_blank'); }
+        // Button Click Events
+        document.getElementById('tapBtn').addEventListener('click', () => {
+            count++; updateUI();
+            if (navigator.vibrate) navigator.vibrate(50);
+        });
 
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            if(confirm("Reset Count?")) { count = 0; updateUI(); }
+        });
+
+        document.getElementById('targetBtn').addEventListener('click', () => {
+            let g = prompt("Set Target:", goal);
+            if(g) { goal = parseInt(g); updateUI(); localStorage.setItem('mag_goal', goal); }
+        });
+
+        document.getElementById('soundBtn').addEventListener('click', () => {
+            isMuted = !isMuted;
+            localStorage.setItem('mag_mute', isMuted);
+            document.getElementById('soundBtn').innerText = isMuted ? '🔇 Off' : '🔊 On';
+        });
+
+        document.getElementById('shareBtn').addEventListener('click', () => {
+            window.open(`https://wa.me/?text=Divine Beads App: Sadaqah-e-Jariyah! Join me.`, '_blank');
+        });
+
+        // Initialize Mala Beads
         const malaWrap = document.getElementById('malaWrap');
         for (let i = 0; i < 33; i++) {
             const b = document.createElement('div');
