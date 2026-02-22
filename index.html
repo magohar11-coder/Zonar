@@ -1,1262 +1,234 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Army Soldier Shooter - PUBG Zone</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Divine Beads - M.A. Gohar</title>
+    <meta name="theme-color" content="#030a16">
     <style>
-        /* --- Base & Device Styling --- */
+        :root {
+            --app-bg: #030a16;
+            --card-bg: radial-gradient(circle, #0a192f 0%, #02060c 100%);
+            --gold-glow: #f3ba2f;
+            --bead-color: #ffd700;
+            --text-gray: #94a3b8;
+            --neon-border: #00d2ff;
+        }
+
         body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f8f9fa; 
-            color: #343a40; 
-            font-family: Arial, sans-serif; 
-            overflow: hidden; 
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; background-color: var(--app-bg);
+            font-family: 'Segoe UI', sans-serif; color: white;
+            user-select: none; overflow: hidden;
         }
 
-        .game-device {
-            width: 450px; 
-            background-color: #e9ecef; 
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2); 
-            border: 5px solid #6c757d; 
+        @keyframes neonBorderGlow {
+            0% { border-color: #00d2ff; box-shadow: 0 0 20px #00d2ff, inset 0 0 10px #00d2ff; }
+            33% { border-color: #f3ba2f; box-shadow: 0 0 25px #f3ba2f, inset 0 0 10px #f3ba2f; }
+            66% { border-color: #ff00ff; box-shadow: 0 0 25px #ff00ff, inset 0 0 10px #ff00ff; }
+            100% { border-color: #00d2ff; box-shadow: 0 0 20px #00d2ff, inset 0 0 10px #00d2ff; }
+        }
+
+        @keyframes buttonPulse {
+            0% { border-color: rgba(0, 210, 255, 0.5); box-shadow: 0 0 5px rgba(0, 210, 255, 0.2); }
+            50% { border-color: var(--gold-glow); box-shadow: 0 0 15px var(--gold-glow); }
+            100% { border-color: rgba(0, 210, 255, 0.5); box-shadow: 0 0 5px rgba(0, 210, 255, 0.2); }
+        }
+
+        /* AUTO-FIT PHONE FRAME */
+        .phone-frame {
+            background: var(--card-bg);
+            width: 90vw; 
+            max-width: 340px;
+            height: 92vh;
+            max-height: 700px;
+            padding: 20px 15px;
+            border-radius: 40px; 
             text-align: center;
-            position: relative;
-        }
-
-        #logo-display {
-            font-size: 1.5em; 
-            color: purple;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-shadow: none; 
-        }
-
-        .mute-button {
-            background: none;
-            border: none;
-            font-size: 1.5em;
-            cursor: pointer;
-            padding: 5px;
-            color: #495057; 
-            transition: color 0.2s;
-            position: absolute; 
-            top: 15px;
-            right: 15px;
-        }
-        
-        h2 {
-            color: #343a40; 
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
-
-        /* --- Game Container (Dynamic Background) --- */
-        .game-container {
-            width: 400px; 
-            height: 600px; 
-            background-color: #ffffff; /* White background fallback */
-            border: 2px solid #556b2f; 
-            position: relative;
-            overflow: hidden; 
-            margin: 0 auto 15px;
-            cursor: none; 
-            transition: background-image 0.5s ease-in-out, background-color 0.5s ease-in-out; 
-            background-size: cover; 
-            background-position: center bottom; 
-        }
-        
-        /* --- NEW FEATURE: PLAYZONE STYLES --- */
-        #playzone {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%; 
-            height: 100%;
-            border: 5px solid rgba(0, 128, 0, 0.5); /* Green zone boundary */
-            box-shadow: 0 0 15px rgba(0, 128, 0, 0.8) inset;
-            box-sizing: border-box;
-            transition: width 5s linear, height 5s linear, top 5s linear, left 5s linear, border-color 0.5s;
-            z-index: 1; /* Below UI and Player */
-        }
-        .zone-damage-flash {
-            border-color: rgba(255, 0, 0, 0.8) !important;
-        }
-        /* --- End of Playzone Styles --- */
-
-
-        /* --- Scoreboard & UI --- */
-        .game-ui {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px 10px;
-            background-color: rgba(0, 0, 0, 0.4); 
-            color: white; 
-            font-size: 0.8em;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            box-sizing: border-box;
-            z-index: 10;
-            transition: background-color 0.5s; 
-        }
-        #score-board span, #lives-display span {
-            color: #ffe082; 
-        }
-        #high-score-display {
-            font-size: 0.8em;
-            color: #a8dadc;
-        }
-
-        /* --- Player (Dynamic Emoji) --- */
-        .player {
-            font-size: 25px; 
-            position: absolute;
-            bottom: 5px;
-            left: 180px;
-            width: 40px; 
-            height: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 5;
-            transition: left 0.05s ease-out, color 0.3s ease-in-out; 
-            line-height: 0.9; 
-            will-change: left; 
-            color: black; 
-        }
-        .player-gun {
-            font-size: 30px;
-            transform: rotate(90deg); 
-            margin-top: -5px;
-        }
-
-        /* Player State Colors */
-        .player.shielded {
-            color: red; 
-            outline: 3px solid #dc3545; 
-            outline-offset: 3px;
-            border-radius: 5px; 
-            animation: shield-glow 0.5s infinite alternate;
-        }
-        .player.laser-ready {
-            color: gold; 
-        }
-        @keyframes shield-glow {
-            from { box-shadow: 0 0 5px #dc3545; }
-            to { box-shadow: 0 0 15px #dc3545; }
-        }
-
-        /* --- Player Bullets (Gun/Rifle) --- */
-        .bullet {
-            font-size: 20px; 
-            position: absolute;
-            width: 20px; 
-            height: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 4;
-            color: #ffd700; 
-            text-shadow: 0 0 5px #ffeb3b; 
-            animation: bullet-glow 0.1s infinite alternate; 
-        }
-        @keyframes bullet-glow {
-            from { opacity: 1; transform: scale(1); }
-            to { opacity: 0.8; transform: scale(1.1); }
-        }
-
-        /* --- Laser Special Weapon --- */
-        .laser {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100%; 
-            background-color: rgba(255, 0, 0, 0.5); 
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.6);
-            z-index: 100; 
-            animation: laser-pulse 0.2s ease-out forwards; 
-            opacity: 0;
-        }
-        @keyframes laser-pulse {
-            0% { opacity: 0; transform: scaleY(0); transform-origin: bottom; }
-            50% { opacity: 1; transform: scaleY(1); transform-origin: bottom; }
-            100% { opacity: 0; transform: scaleY(1); transform-origin: bottom; }
-        }
-
-
-        /* --- Enemy (Dynamic Emoji) --- */
-        .enemy {
-            font-size: 35px; 
-            position: absolute;
-            top: 0;
-            width: 40px; 
-            height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 3;
-            transform: none; 
-        }
-
-        /* Special Fast Enemy */
-        .enemy.fast-lane {
-            font-size: 40px; 
-            color: gold;
-            animation: fast-blink 0.2s infinite alternate;
-        }
-        @keyframes fast-blink {
-            from { opacity: 1; }
-            to { opacity: 0.5; }
-        }
-
-
-        /* --- Enemy Bullets (Dynamic Emoji/Style) --- */
-        .enemy-bullet {
-            font-size: 25px; 
-            position: absolute;
-            width: 25px; 
-            height: 25px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2;
-        }
-        /* Custom bullet style for City Ruins theme */
-        .enemy-bullet.lazer-red-circle {
-            background-color: red;
-            border-radius: 50%;
-            font-size: 0; 
-            box-shadow: 0 0 5px red;
-        }
-
-        /* --- Power-up (First Aid) --- */
-        .power-up {
-            font-size: 30px;
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 6;
-            top: -30px;
-            animation: pulse 1s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(1.1); opacity: 0.9; }
-        }
-
-        /* --- Message Overlay --- */
-        #message-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.9); 
-            color: #343a40; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            font-size: 0.9em;
-            text-align: center;
-            cursor: pointer;
-            z-index: 100; 
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        #message-overlay h3 {
-            font-size: 1.5em;
-            color: #dc3545; 
-            margin-bottom: 15px;
-        }
-        #message-overlay .score-final {
-            font-size: 1.2em;
-            color: #007bff; 
-            margin-top: 10px;
-        }
-        #message-overlay .high-score-info {
-            font-size: 1em;
-            color: #6c757d;
-            margin-top: 5px;
-        }
-
-        /* --- Mobile Controls --- */
-        .mobile-controls {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            margin-top: 15px;
             position: relative; 
-            z-index: 1000; 
-        }
-        .control-button {
-            background-color: #007bff; 
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            font-size: 1.2em;
-            border-radius: 8px;
-            cursor: pointer;
-            user-select: none; 
-            -webkit-tap-highlight-color: transparent;
-        }
-        .control-button:active {
-            background-color: #0056b3;
-        }
-        #laser-btn {
-            background-color: #dc3545; 
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            padding: 10px 15px;
-            font-size: 1em;
-            display: none; 
-        }
-        #laser-btn.active {
-            animation: pulse-red 1s infinite;
-        }
-        @keyframes pulse-red {
-            0% { background-color: #dc3545; box-shadow: 0 0 5px #dc3545; }
-            50% { background-color: #ff4d4d; box-shadow: 0 0 15px #ff4d4d; }
-            100% { background-color: #dc3545; box-shadow: 0 0 5px #dc3545; }
+            border: 6px solid #1e293b; 
+            animation: neonBorderGlow 5s linear infinite;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around; /* Elements ke beech gap auto-adjust hoga */
+            box-sizing: border-box;
         }
 
-        /* Touch area for player movement */
-        #touch-area {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1; 
+        /* TOP BUTTONS RESPONSIVE */
+        .top-container { display: flex; justify-content: space-between; align-items: center; padding: 0 5px; }
+        .side-btn { 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white; padding: 8px 12px; border-radius: 12px; font-size: 0.65rem; cursor: pointer;
+            animation: buttonPulse 3s infinite ease-in-out;
+        }
+
+        
+        .volume-control input { width: 80px; accent-color: var(--gold-glow); }
+
+        .header-stats { display: flex; justify-content: space-between; padding: 0 10px; font-size: 0.85rem; color: var(--text-gray); }
+        
+        /* RING SIZE AUTO-ADJUST */
+        .ring-container {
+            position: relative; 
+            width: 180px; 
+            height: 180px; 
+            margin: 5px auto;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .bead {
+            position: absolute; width: 10px; height: 10px;
+            background: radial-gradient(circle at 30% 30%, #fff, var(--bead-color));
+            border-radius: 50%; left: 50%; top: 0; transform-origin: 50% 90px;
+        }
+
+        .total-display { font-size: 3.5rem; font-weight: 100; margin: 0; z-index: 10; color: #fff; }
+
+        /* MAIN BUTTON RESPONSIVE */
+        .dhikr-btn {
+            width: 120px; height: 120px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.1);
+            background: radial-gradient(circle at 35% 35%, #fcd34d 0%, #b28924 100%);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            cursor: pointer; display: flex; justify-content: center; align-items: center; 
+            margin: 5px auto; outline: none; flex-shrink: 0;
+        }
+
+        /* Responsive Fix for Small Screens */
+        @media (max-height: 600px) {
+            .app-title { font-size: 0.9rem; }
+            .ring-container { width: 150px; height: 150px; }
+            .bead { transform-origin: 50% 75px; }
+            .dhikr-btn { width: 100px; height: 100px; }
+            .total-display { font-size: 2.5rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="game-device">
-        <button id="mute-btn" class="mute-button">🔊</button>
-        <div id="logo-display">⭐ Powered By M.A.Gohar ⭐</div>
-        <h2>Army Soldier Shooter - PUBG Zone</h2>
-        
-        <div class="game-container" id="game-container">
-            <div class="game-ui">
-                <div id="score-board">Score: <span>0</span></div>
-                <div id="lives-display">Lives: <span>❤️❤️❤️</span></div>
-                <div id="high-score-display">High Score: <span>0</span></div>
-            </div>
+    <div class="phone-frame">
+        <div class="top-container">
+            <button class="side-btn" onclick="reset()">RESET</button>
+            <button class="side-btn" onclick="setGoal()">TARGET</button>
+        </div>
 
-            <div id="playzone"></div> <div id="touch-area"></div>
-            <div id="message-overlay">
-                <h3>Welcome to Army Soldier Shooter! (PUBG Style)</h3>
-                <p>Click or Press Enter/Space to Start!</p>
-                <p>Use Arrow Keys (← →) to move, SPACE to shoot.</p>
-                <p>Stay inside the **Green Zone** or take damage!</p>
-                <p class="score-final" style="display:none;">Final Score: 0</p>
-                <p class="high-score-info" style="display:none;">Your Best: 0</p>
+        <div class="branding-header">
+            <Font SIZE="5">DIVINE BEADS</font>
+          <p>  <font size="5">پاک تسبیح</font></p>
+          <p> <b><font size="4">Powered By M.A.Gohar</b>
+        </div>
+
+        <marquee>Sadaqah-e-Jariyah: Share App And earn the Reward till the time of Qayamah; this is 100% secure App No Adult Ads | 100% Family & Child Safe ! you don't need to give its any phone's Permission |follow us on Instagram: (goha.r7776) or Email us dialanddeal78@gmail.com (9927530866)for more info</marquee>
+
+        <div class="volume-control">
+            <span style="font-size: 0.6rem;">🔈</span>
+            <input type="range" id="volSlider" min="0" max="1" step="0.1" value="0.5">
+            <span style="font-size: 0.6rem;">🔊</span>
+        </div>
+
+        <div class="header-stats">
+            <div class="stat-col" style="text-align: left;">
+                <span>Today: <b id="todayCount" style="color:#fff">0</b></span>
+                <div class="side-btn" id="soundBtn" onclick="toggleSound()" style="padding: 3px 6px; margin-top: 5px;">🔊 On</div>
             </div>
-            <button id="laser-btn" class="control-button">LASER</button>
+            <div class="stat-col" style="text-align: right;">
+                <span>Target: <b id="targetLabel" style="color:#fff">100</b></span>
+                <div class="side-btn" onclick="shareApp()" style="padding: 3px 6px; margin-top: 5px;">🔗 Share</div>
+            </div>
         </div>
-        
-        <div class="mobile-controls">
-            <button class="control-button" id="left-btn">◀</button>
-            <button class="control-button" id="shoot-btn">🔫</button>
-            <button class="control-button" id="right-btn">▶</button>
+
+        <div class="ring-container">
+            <div class="mala-beads-wrap" id="malaWrap" style="position: absolute; width: 100%; height: 100%; transition: transform 0.3s;"></div>
+            <h1 class="total-display" id="mainCounter">0</h1>
         </div>
+
+        <button class="dhikr-btn" id="tapBtn">
+            <span style="font-size: 1rem; color: #4a3700; font-weight: 900;">PRESS</span>
+        </button>
     </div>
 
     <script>
-        // --- 1. CONFIGURATION AND INITIAL SETUP ---
-        const container = document.getElementById('game-container');
-        const scoreBoard = document.querySelector('#score-board span');
-        const livesDisplay = document.querySelector('#lives-display span');
-        const highScoreDisplay = document.querySelector('#high-score-display span'); 
-        const messageOverlay = document.getElementById('message-overlay');
-        const muteButton = document.getElementById('mute-btn'); 
-        const touchArea = document.getElementById('touch-area'); 
-        const laserButton = document.getElementById('laser-btn'); 
-        const gameUI = document.querySelector('.game-ui');
-        // NEW ELEMENT
-        const playzone = document.getElementById('playzone'); 
+        let count = parseInt(localStorage.getItem('mag_count')) || 0;
+        let goal = parseInt(localStorage.getItem('mag_goal')) || 100;
+        let isMuted = localStorage.getItem('mag_mute') === 'true';
+        let appVolume = parseFloat(localStorage.getItem('mag_vol')) || 0.5;
 
-        const containerWidth = 400;
-        const containerHeight = 600;
+        const mainDisplay = document.getElementById('mainCounter');
+        const volSlider = document.getElementById('volSlider');
+        volSlider.value = appVolume;
 
-        let player;
-        let score = 0;
-        let highScore = localStorage.getItem('armyShooterHighScore') ? parseInt(localStorage.getItem('armyShooterHighScore')) : 0; 
-        let lives = 3;
-        let isPlaying = false;
-        let isMuted = false; 
-        let isShielded = false; 
-        let hasSpecialWeapon = false; 
-
-        let playerBullets = [];
-        let enemies = [];
-        let enemyBullets = [];
-        let powerUps = []; 
-
-        let enemySpawnInterval;
-        let powerUpSpawnInterval; 
-        let gameLoopInterval;
-        let enemyFireIntervals = {}; 
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
-        // --- Game Speeds ---
-        let baseEnemySpeed = 1.5; 
-        let enemyBulletSpeed = 6;
-        let playerBulletSpeed = 10;
-        let playerMoveSpeed = 7; 
-
-        // New state for combined movement logic
-        let moveState = { 
-            left: false, 
-            right: false,
-            touchX: null 
-        }; 
-        
-        // --- NEW ZONE CONFIGURATION ---
-        let zoneState = {
-            width: containerWidth,
-            height: containerHeight,
-            top: 0,
-            left: 0
-        };
-        let zoneShrinkInterval;
-        const ZONE_SHRINK_RATE = 20; // Pixels to shrink per step
-        const ZONE_SHRINK_DELAY = 20000; // Shrink every 20 seconds (20000ms)
-        const ZONE_SHRINK_DURATION = 5000; // Total time for shrinking animation (CSS transition)
-
-
-        // --- EMOJI & ASSETS ---
-        const PLAYER_BULLET_EMOJI = '🌟'; 
-        const LIFE_EMOJI = '❤️';
-        const SHIELD_EMOJI = '🩹'; 
-
-        // --- THEMES CONFIGURATION (FIXED: Using CSS Gradients instead of Image URLs) ---
-        const themes = {
-            'forest': {
-                // FIXED: Using reliable CSS Gradient instead of external image URL
-                background: "linear-gradient(to top, #556B2F 0%, #A9A9A9 50%, #87CEEB 100%)", 
-                player_body: '🧑‍✈️',
-                player_gun: '🔫',
-                normal_enemies: ['🧑‍🤝‍🧑', '🧍', '🚶', '🏃', '🥷', '🧟', '🕵️'],
-                fast_enemy: '💰',
-                enemy_bullet: '💥',
-                ui_color: 'rgba(0, 0, 0, 0.5)'
-            },
-            'desert': {
-                // FIXED: Using reliable CSS Gradient instead of external image URL
-                background: "linear-gradient(to bottom, #FFD700 0%, #B8860B 70%, #8B4513 100%)", 
-                player_body: '🤠',
-                player_gun: '🔫',
-                normal_enemies: ['🌵', '🐍', '🦂', '🕷️', '🐪'],
-                fast_enemy: '🏜️',
-                enemy_bullet: '🔥',
-                ui_color: 'rgba(139, 69, 19, 0.6)' 
-            },
-            'city_ruins': {
-                // FIXED: Using reliable CSS Gradient instead of external image URL
-                background: "linear-gradient(to top, #36454F 0%, #505050 50%, #101010 100%)", 
-                player_body: '🤖', 
-                player_gun: '⚡', 
-                normal_enemies: ['🤖', '👾', '👽', '💀'],
-                fast_enemy: '🛸', 
-                enemy_bullet: 'lazer-red-circle', 
-                ui_color: 'rgba(52, 58, 64, 0.7)'
-            }
-        };
-
-        let currentTheme = 'forest'; 
-        let currentThemeThreshold = 0; 
-        const themeChangeInterval = 500; // Theme changes every 500 score
-
-        // --- Audio Context & Sounds ---
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-        function playSound(frequency, duration, type = 'square', volume = 0.5) {
-            if (isMuted) return; 
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            oscillator.type = type;
-            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-            gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + duration);
-        }
-
-        function playSpeech(text, pitch = 1.5, rate = 1.2) {
-            if (isMuted || !('speechSynthesis' in window)) {
-                playSound(800, 0.1, 'sine');
-                return;
-            }
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.pitch = pitch; 
-            utterance.rate = rate; 
-            utterance.voice = speechSynthesis.getVoices().find(v => v.lang.startsWith('en')) || speechSynthesis.getVoices()[0];
-            window.speechSynthesis.speak(utterance);
-        }
-
-        function playSpeechTwice(text, pitch, rate) {
-            playSpeech(text, pitch, rate);
-            setTimeout(() => {
-                playSpeech(text, pitch, rate);
-            }, 1500); 
-        }
-
-        function playPlayerShootSound() { playSound(1400, 0.03, 'square', 0.6); } 
-        function playEnemyShootSound() { playSound(200, 0.1, 'sawtooth', 0.5); } 
-        function playHitSound() { playSound(400, 0.1, 'sawtooth'); }
-        function playPlayerHitSound() { playSound(100, 0.3, 'sine'); } 
-        function playPowerUpSound() { playSound(1200, 0.15, 'sine', 0.8); } 
-        function playEnemyDieSound() { playSpeech("Enemy Down", 1.8, 1.5); playHitSound(); }
-        function playLaserSound() { playSound(800, 0.3, 'sine', 1.0); playSound(1000, 0.3, 'triangle', 0.8); }
-        function playFastEnemyDieSound() { playSpeech("Bonus Score", 2.0, 1.8); playSound(1500, 0.1, 'triangle'); }
-        function playZoneDamageSound() { playSound(60, 0.1, 'sawtooth'); } // Low frequency sound for damage
-
-        function toggleMute() {
-            isMuted = !isMuted;
-            muteButton.textContent = isMuted ? '🔇' : '🔊';
-            if (!isMuted) {
-                playSound(800, 0.1, 'triangle'); 
-            }
-        }
-        muteButton.addEventListener('click', toggleMute);
-
-
-        // --- 2. THEME LOGIC ---
-
-        function applyTheme(themeName) {
-            currentTheme = themeName;
-            const theme = themes[themeName];
-            
-            // 1. Apply Background (Uses CSS Gradient)
-            container.style.backgroundImage = theme.background;
-            
-            // 2. Apply UI Color
-            gameUI.style.backgroundColor = theme.ui_color;
-            
-            // 3. Update Player appearance
-            if (player) {
-                const gunElement = player.querySelector('.player-gun');
-                player.innerHTML = `${theme.player_body}`; 
-                if (gunElement) {
-                    player.appendChild(gunElement); 
-                    gunElement.textContent = theme.player_gun; 
-                } else {
-                    const newGun = document.createElement('div');
-                    newGun.classList.add('player-gun');
-                    newGun.textContent = theme.player_gun;
-                    player.appendChild(newGun);
-                }
-            }
-            
-            // 4. Update Game State / Difficulty
-            baseEnemySpeed = 1.5 + Object.keys(themes).indexOf(themeName) * 0.5; 
-            
-            playSpeech(`Entering ${themeName} zone!`, 1.5, 1.2);
-
-            // Clean up existing enemies to spawn new ones with new theme look
-            enemies.forEach(e => e.remove());
-            enemies = [];
-            for(let id in enemyFireIntervals) { clearInterval(enemyFireIntervals[id]); }
-            enemyFireIntervals = {};
-        }
-
-        function updateThemeBasedOnScore() {
-            let newThemeName = currentTheme;
-            let themeIndex = Object.keys(themes).indexOf(currentTheme);
-            const themeKeys = Object.keys(themes);
-
-            // Check if score passed the next theme threshold (Every 500 score)
-            if (score >= currentThemeThreshold + themeChangeInterval) {
-                themeIndex++;
-                if (themeIndex < themeKeys.length) {
-                    newThemeName = themeKeys[themeIndex];
-                    currentThemeThreshold = score; 
-                    applyTheme(newThemeName);
-                } else if (themeIndex >= themeKeys.length) {
-                    // Loop back to the first theme but increase difficulty/speed
-                    newThemeName = themeKeys[0];
-                    currentThemeThreshold = score;
-                    applyTheme(newThemeName);
-                }
-            }
-        }
-
-
-        // --- 3. GAME OBJECTS AND MOVEMENT ---
-
-        function createPlayer() {
-            player = document.createElement('div');
-            player.classList.add('player');
-            player.innerHTML = `${themes[currentTheme].player_body}<div class="player-gun">${themes[currentTheme].player_gun}</div>`;
-            player.style.left = `${containerWidth / 2 - 20}px`;
-            container.appendChild(player);
-        }
-
-        function spawnEnemy() {
-            if (!isPlaying) return;
-
-            const enemy = document.createElement('div');
-            enemy.classList.add('enemy');
-            
-            let isFastEnemy = Math.random() < 0.1 + (score / 2000); 
-
-            if (isFastEnemy) {
-                enemy.textContent = themes[currentTheme].fast_enemy;
-                enemy.classList.add('fast-lane');
-                enemy.isFast = true;
-            } else {
-                const randomEmoji = themes[currentTheme].normal_enemies[Math.floor(Math.random() * themes[currentTheme].normal_enemies.length)];
-                enemy.textContent = randomEmoji;
-                enemy.isFast = false;
-            }
-            
-            // Ensure enemy spawns within the current playzone width
-            const maxSpawnX = zoneState.width - 40 + zoneState.left;
-            const minSpawnX = zoneState.left;
-            const x = Math.floor(Math.random() * (maxSpawnX - minSpawnX)) + minSpawnX; 
-
-            enemy.style.left = `${x}px`;
-            enemy.style.top = `-40px`; 
-            
-            let currentEnemySpeed = baseEnemySpeed + (score / 400); 
-            if (currentEnemySpeed > 4.5) currentEnemySpeed = 4.5; 
-            
-            if (enemy.isFast) {
-                enemy.speed = Math.random() * 2 + currentEnemySpeed * 2; 
-            } else {
-                enemy.speed = Math.random() * 1.5 + currentEnemySpeed; 
-            }
-            
-            container.appendChild(enemy);
-            enemies.push(enemy);
-
-            enemy.id = `enemy-${Date.now()}-${Math.random()}`; 
-
-            if (!enemy.isFast) {
-                // DIFFICULTY FIX: Slower enemy fire rate for better performance
-                let fireDelay = Math.random() * 2500 + 1000 - (score / 100); 
-                if (fireDelay < 500) fireDelay = 500; 
-                
-                enemyFireIntervals[enemy.id] = setInterval(() => {
-                    if(isPlaying && enemy.parentNode) { 
-                        fireEnemyBullet(enemy);
-                    } else {
-                        clearInterval(enemyFireIntervals[enemy.id]);
-                        delete enemyFireIntervals[enemy.id];
-                    }
-                }, fireDelay);
-            }
-        }
-
-        function spawnPowerUp() {
-            if (!isPlaying) return;
-            
-            const powerUp = document.createElement('div');
-            powerUp.classList.add('power-up');
-            powerUp.textContent = SHIELD_EMOJI;
-            
-            // Ensure power-up spawns within the current playzone
-            const maxSpawnX = zoneState.width - 30 + zoneState.left;
-            const minSpawnX = zoneState.left;
-            const x = Math.floor(Math.random() * (maxSpawnX - minSpawnX)) + minSpawnX; 
-
-            powerUp.style.left = `${x}px`;
-            powerUp.style.top = `-30px`; 
-
-            powerUp.type = 'shield'; 
-            
-            container.appendChild(powerUp);
-            powerUps.push(powerUp);
-        }
-
-        function firePlayerBullet() {
-            if (!isPlaying || !player) return;
-            
-            const bullet = document.createElement('div');
-            bullet.classList.add('bullet');
-            bullet.textContent = PLAYER_BULLET_EMOJI;
-            
-            const bulletX = player.offsetLeft + (player.offsetWidth / 2) - 10; 
-            const bulletY = player.offsetTop - 10; 
-            
-            bullet.style.left = `${bulletX}px`;
-            bullet.style.top = `${bulletY}px`;
-            
-            container.appendChild(bullet);
-            playerBullets.push(bullet);
-            playPlayerShootSound();
-        }
-
-        function useSpecialWeapon() {
-            if (!isPlaying || !hasSpecialWeapon) return;
-
-            hasSpecialWeapon = false;
-            laserButton.style.display = 'none';
-            laserButton.classList.remove('active');
-            player.classList.remove('laser-ready'); 
-            
-            playSpeech("Laser activated!", 2.0, 1.8);
-            playLaserSound();
-
-            const laserDiv = document.createElement('div');
-            laserDiv.classList.add('laser');
-            container.appendChild(laserDiv);
-
-            enemies.forEach(enemy => {
-                enemy.remove();
-                clearInterval(enemyFireIntervals[enemy.id]);
-                delete enemyFireIntervals[enemy.id];
-                score += enemy.isFast ? 100 : 10; 
-            });
-            enemies = []; 
-            scoreBoard.textContent = `${score}`;
-
-            laserDiv.addEventListener('animationend', () => {
-                laserDiv.remove();
-            });
-        }
-
-
-        function fireEnemyBullet(enemy) {
-            if (!isPlaying || !enemy || !enemy.parentNode) return;
-
-            const enemyBullet = document.createElement('div');
-            enemyBullet.classList.add('enemy-bullet');
-
-            const bulletContent = themes[currentTheme].enemy_bullet;
-
-            if (bulletContent.startsWith('lazer-')) {
-                enemyBullet.classList.add(bulletContent);
-            } else {
-                enemyBullet.textContent = bulletContent;
-            }
-            
-            const bulletX = enemy.offsetLeft + (enemy.offsetWidth / 2) - 12; 
-            const bulletY = enemy.offsetTop + enemy.offsetHeight - 5; 
-            
-            enemyBullet.style.left = `${bulletX}px`;
-            enemyBullet.style.top = `${bulletY}px`;
-            
-            container.appendChild(enemyBullet);
-            enemyBullets.push(enemyBullet);
-            playEnemyShootSound();
-        }
-
-
-        function updatePositions() {
-            // Player movement logic (using touchX or button flags)
-            let playerX = player.offsetLeft;
-            const playerWidth = 40;
-            
-            if (moveState.touchX !== null) {
-                const targetX = moveState.touchX - (playerWidth / 2);
-                playerX = targetX;
-            } else if (moveState.left) {
-                playerX -= playerMoveSpeed; 
-            } else if (moveState.right) {
-                playerX += playerMoveSpeed;
-            }
-            
-            // Boundary checks (Player stays within container, zone logic handles damage)
-            if (playerX < 0) playerX = 0;
-            if (playerX > containerWidth - playerWidth) playerX = containerWidth - playerWidth;
-            player.style.left = `${playerX}px`;
-
-            // Bullet, Enemy, Enemy Bullet, Power-up movements
-            playerBullets = playerBullets.filter(bullet => {
-                let y = bullet.offsetTop - playerBulletSpeed; 
-                if (y < -30) { bullet.remove(); return false; }
-                bullet.style.top = `${y}px`;
-                return true;
-            });
-
-            enemies = enemies.filter(enemy => {
-                let y = enemy.offsetTop + enemy.speed; 
-                if (y > containerHeight + 40) { 
-                    enemy.remove(); 
-                    clearInterval(enemyFireIntervals[enemy.id]);
-                    delete enemyFireIntervals[enemy.id];
-                    return false; 
-                } 
-                enemy.style.top = `${y}px`;
-                return true;
-            });
-
-            enemyBullets = enemyBullets.filter(bullet => {
-                let y = bullet.offsetTop + enemyBulletSpeed; 
-                if (y > containerHeight + 30) { bullet.remove(); return false; }
-                bullet.style.top = `${y}px`;
-                return true;
-            });
-
-            powerUps = powerUps.filter(pUp => {
-                let y = pUp.offsetTop + 4; 
-                if (y > containerHeight + 30) { pUp.remove(); return false; }
-                pUp.style.top = `${y}px`;
-                return true;
-            });
-        }
-        
-        // --- NEW ZONE DAMAGE CHECK ---
-        function checkZoneDamage() {
-            if (!isPlaying || !player) return;
-
-            const pRect = player.getBoundingClientRect();
-            const zoneRect = playzone.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-            
-            // Player position relative to the container
-            const pX = pRect.left - containerRect.left;
-            const pY = pRect.top - containerRect.top;
-            const pW = pRect.width;
-            const pH = pRect.height;
-            
-            // Zone boundaries relative to the container
-            const zLeft = zoneState.left;
-            const zTop = zoneState.top;
-            const zRight = zoneState.left + zoneState.width;
-            const zBottom = zoneState.top + zoneState.height;
-
-            // Check if player center is outside the zone boundaries
-            const playerCenter = pX + pW / 2;
-            const playerMiddle = pY + pH / 2;
-
-            if (playerCenter < zLeft || playerCenter > zRight || 
-                playerMiddle < zTop || playerMiddle > zBottom) {
-                
-                // Player is outside the safe zone! Take damage.
-                playZoneDamageSound();
-                playerHit(true); // Player Hit function now accepts 'isZoneDamage'
-                
-                // Red flash border for zone damage feedback
-                playzone.classList.add('zone-damage-flash');
-                setTimeout(() => {
-                    playzone.classList.remove('zone-damage-flash');
-                }, 100);
-
-                // Check if the zone has shrunk completely and player is outside
-                if (zoneState.width <= 40 && lives > 1) {
-                    // If zone is minimal, increase damage rate or lose instantly
-                    lives -= 1; 
-                    livesDisplay.textContent = LIFE_EMOJI.repeat(lives); 
-                    if (lives <= 0) gameOver();
-                }
-
-            }
-        }
-        
-        function checkCollisions() {
-            if (!player) return;
-            const pRect = player.getBoundingClientRect();
-
-            // 1. Player vs Power-up
-            powerUps = powerUps.filter(pUp => {
-                const pURect = pUp.getBoundingClientRect();
-                if (pRect.left < pURect.right && pRect.right > pURect.left &&
-                    pRect.top < pURect.bottom && pRect.bottom > pURect.top) {
-                    
-                    pUp.remove();
-                    activateShield();
-                    playPowerUpSound();
-                    return false; 
-                }
-                return true;
-            });
-
-            // 2. Player Bullet vs Enemy 
-            playerBullets = playerBullets.filter(pBullet => {
-                const pBRect = pBullet.getBoundingClientRect();
-                let enemyHit = false;
-
-                enemies = enemies.filter(enemy => {
-                    const eRect = enemy.getBoundingClientRect();
-                    if (pBullet.parentNode && enemy.parentNode &&
-                        pBRect.left < eRect.right && pBRect.right > eRect.left &&
-                        pBRect.top < eRect.bottom && pBRect.bottom > eRect.top) {
-                        
-                        enemy.remove();
-                        clearInterval(enemyFireIntervals[enemy.id]); 
-                        delete enemyFireIntervals[enemy.id];
-                        
-                        if (enemy.isFast) {
-                            score += 100;
-                            playFastEnemyDieSound();
-                        } else {
-                            score += 10;
-                            playEnemyDieSound(); 
-                        }
-                        
-                        scoreBoard.textContent = `${score}`;
-                        enemyHit = true;
-                        return false; 
-                    }
-                    return true; 
-                });
-                if (enemyHit) { pBullet.remove(); return false; } 
-                return true; 
-            });
-
-            // 3. Enemy/Enemy Bullet vs Player 
-            // Enemy vs Player
-            enemies = enemies.filter(enemy => {
-                const eRect = enemy.getBoundingClientRect();
-                if (pRect.left < eRect.right && pRect.right > eRect.left &&
-                    pRect.top < eRect.bottom && pRect.bottom > eRect.top) {
-                    
-                    enemy.remove();
-                    clearInterval(enemyFireIntervals[enemy.id]);
-                    delete enemyFireIntervals[enemy.id];
-                    if (!isShielded) { 
-                        playerHit(); 
-                    } else {
-                        playHitSound();
-                    }
-                    return false; 
-                }
-                return true;
-            });
-
-            // Enemy Bullet vs Player
-            enemyBullets = enemyBullets.filter(eBullet => {
-                const eBRect = eBullet.getBoundingClientRect();
-                if (pRect.left < eBRect.right && pBRect.right > eBRect.left &&
-                    pRect.top < eBRect.bottom && pRect.bottom > eBRect.top) {
-                    
-                    eBullet.remove();
-                    if (!isShielded) { 
-                        playPlayerHitSound(); 
-                        playerHit(); 
-                    } else {
-                        playHitSound();
-                    }
-                    return false;
-                }
-                return true;
-            });
-            
-            // Check Zone Damage last
-            checkZoneDamage(); 
-        }
-
-        // --- SHIELD LOGIC ---
-        function activateShield() {
-            isShielded = true;
-            player.classList.add('shielded'); 
-            playSpeech("Defense up", 1.5, 1.2);
-            
-            setTimeout(() => {
-                isShielded = false;
-                player.classList.remove('shielded');
-                if (hasSpecialWeapon) {
-                    player.classList.add('laser-ready');
-                } else {
-                    player.style.color = 'black'; 
-                }
-                playSound(300, 0.1, 'square'); 
-            }, 5000); 
-        }
-
-        // Modified Player Hit function to handle zone damage
-        function playerHit(isZoneDamage = false) {
-            if (isShielded) return; // Shield blocks all damage
-
-            lives--;
-            livesDisplay.textContent = LIFE_EMOJI.repeat(lives); 
-
-            if (lives <= 0) {
-                gameOver();
-            } else {
-                player.style.opacity = 0.3;
-                setTimeout(() => player.style.opacity = 1, 200);
-            }
-        }
-        
-        // --- NEW ZONE SHRINKING LOGIC ---
-        function startZoneShrink() {
-            if (!isPlaying) return;
-
-            // Calculate the new size and position
-            const newWidth = Math.max(40, zoneState.width - ZONE_SHRINK_RATE);
-            const newHeight = Math.max(40, zoneState.height - ZONE_SHRINK_RATE);
-            
-            // Calculate new top/left to keep it centered
-            const shrinkAmountX = (zoneState.width - newWidth) / 2;
-            const shrinkAmountY = (zoneState.height - newHeight) / 2;
-
-            const newLeft = zoneState.left + shrinkAmountX;
-            const newTop = zoneState.top + shrinkAmountY;
-
-            // Update state
-            zoneState.width = newWidth;
-            zoneState.height = newHeight;
-            zoneState.left = newLeft;
-            zoneState.top = newTop;
-            
-            // Apply new styles (CSS transition handles smooth animation)
-            playzone.style.width = `${newWidth}px`;
-            playzone.style.height = `${newHeight}px`;
-            playzone.style.left = `${newLeft}px`;
-            playzone.style.top = `${newTop}px`;
-            
-            // Announce zone shrinking
-            playSpeech("Zone shrinking!", 1.8, 1.5);
-
-            // Stop shrinking if minimal size is reached
-            if (newWidth <= 40 || newHeight <= 40) {
-                clearInterval(zoneShrinkInterval);
-                playSpeech("Final zone reached!", 1.8, 1.5);
-            }
-        }
-
-
-        // --- 4. GAME LOOP AND CONTROL ---
-
-        function gameLoop() {
-            if (!isPlaying) return;
-            updatePositions();
-            checkCollisions();
-            updateThemeBasedOnScore(); 
-
-            // Feature: Laser available at 500 score (or next multiple of 500)
-            if (score >= 500 && !hasSpecialWeapon) { 
-                hasSpecialWeapon = true;
-                laserButton.style.display = 'block';
-                laserButton.classList.add('active'); 
-                player.classList.add('laser-ready'); 
-                playSpeech("Special weapon ready!", 2.0, 1.5);
-            }
-        }
-        
-        function updateGameDifficulty() {
-            // DIFFICULTY FIX: Slower difficulty increase
-            clearInterval(enemySpawnInterval);
-            let newSpawnRate = 2000 - (score / 15); 
-            if (newSpawnRate < 500) newSpawnRate = 500; 
-            enemySpawnInterval = setInterval(spawnEnemy, newSpawnRate);
-        }
-
-        function startGame() {
-            if (isPlaying) return;
-            
-            // Clear previous game state
-            playerBullets.forEach(b => b.remove());
-            enemies.forEach(e => { e.remove(); clearInterval(enemyFireIntervals[e.id]); });
-            enemyBullets.forEach(b => b.remove());
-            powerUps.forEach(p => p.remove()); 
-            if (player) player.remove(); 
-            
-            // Reset player and weapon state
-            isShielded = false;
-            hasSpecialWeapon = false; 
-            laserButton.style.display = 'none';
-            laserButton.classList.remove('active');
-
-            // Reset ZONE state
-            clearInterval(zoneShrinkInterval);
-            zoneState = {
-                width: containerWidth,
-                height: containerHeight,
-                top: 0,
-                left: 0
+        function playTargetAlert() {
+            if (isMuted) return;
+            const playSound = () => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
+                gain.gain.setValueAtTime(appVolume, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 1);
             };
-            playzone.style.width = `${containerWidth}px`;
-            playzone.style.height = `${containerHeight}px`;
-            playzone.style.left = `0px`;
-            playzone.style.top = `0px`;
-
-            // Reset game state arrays and intervals
-            playerBullets = [];
-            enemies = [];
-            enemyBullets = [];
-            powerUps = []; 
-            for(let id in enemyFireIntervals) { clearInterval(enemyFireIntervals[id]); }
-            enemyFireIntervals = {};
-
-            score = 0;
-            lives = 3;
-            scoreBoard.textContent = `${score}`;
-            livesDisplay.textContent = LIFE_EMOJI.repeat(lives);
-            isPlaying = true;
-            
-            // Apply initial theme settings
-            currentThemeThreshold = 0;
-            applyTheme('forest'); 
-            createPlayer();
-
-            playSpeechTwice("Powered by M A Gohar, Get ready!", 1.5, 1.0);
-            
-            // Set intervals
-            gameLoopInterval = setInterval(gameLoop, 1000 / 60); 
-            
-            // Enemy spawn and difficulty
-            setTimeout(() => {
-                 enemySpawnInterval = setInterval(spawnEnemy, 2000); 
-            }, 1500); 
-            
-            powerUpSpawnInterval = setInterval(spawnPowerUp, 15000); 
-            
-            setInterval(updateGameDifficulty, 5000); 
-            
-            // NEW ZONE INTERVAL: Start shrinking after initial delay
-            zoneShrinkInterval = setInterval(startZoneShrink, ZONE_SHRINK_DELAY);
-
-            messageOverlay.style.display = 'none'; 
-            
-            playSound(440, 0.1, 'sine'); 
-        }
-
-        function gameOver() {
-            isPlaying = false;
-            clearInterval(gameLoopInterval);
-            clearInterval(enemySpawnInterval);
-            clearInterval(powerUpSpawnInterval); 
-            clearInterval(zoneShrinkInterval); // Clear zone interval
-            for(let id in enemyFireIntervals) { clearInterval(enemyFireIntervals[id]); }
-            enemyFireIntervals = {};
-
-            playSpeech("Mission failed, better luck next time!", 1.5); 
-            
-            let currentHighScore = localStorage.getItem('armyShooterHighScore') ? parseInt(localStorage.getItem('armyShooterHighScore')) : 0;
-            let newHighScore = score > currentHighScore ? score : currentHighScore;
-            localStorage.setItem('armyShooterHighScore', newHighScore);
-            highScoreDisplay.textContent = `${newHighScore}`;
-            
-            messageOverlay.querySelector('.score-final').textContent = `Final Score: ${score}`;
-            messageOverlay.querySelector('.high-score-info').textContent = `Your Best: ${newHighScore}`;
-
-            messageOverlay.innerHTML = `
-                <div id="logo-display">⭐ Powered By M.A.Gohar ⭐</div>
-                <h3>GAME OVER!</h3>
-                <p class="score-final">Final Score: ${score}</p>
-                <p class="high-score-info">Your Best: ${newHighScore}</p>
-                <p>Click or Press Enter/Space to Restart.</p>
-            `;
-            messageOverlay.style.display = 'flex';
-            messageOverlay.addEventListener('click', startGame, { once: true }); 
-        }
-
-        // --- 5. CONTROLS (TOUCH AND BUTTON LOGIC) ---
-
-        // Keyboard Controls
-        document.addEventListener('keydown', (e) => {
-            if (!isPlaying) {
-                if (e.key === ' ' || e.key === 'Enter') {
-                    startGame();
-                }
-                return;
+            playSound();
+            setTimeout(playSound, 1100);
+            if (navigator.vibrate) {
+                navigator.vibrate([400, 200, 400, 200, 400]); 
             }
+        }
 
-            if (e.key === 'ArrowLeft') { moveState.left = true; moveState.touchX = null; } 
-            else if (e.key === 'ArrowRight') { moveState.right = true; moveState.touchX = null; } 
-            else if (e.key === ' ') { firePlayerBullet(); e.preventDefault(); }
-            else if (e.key === 'L' || e.key === 'l') { useSpecialWeapon(); }
-        });
+        function updateUI() {
+            mainDisplay.innerText = count;
+            document.getElementById('todayCount').innerText = count;
+            document.getElementById('targetLabel').innerText = goal;
+            document.getElementById('malaWrap').style.transform = `rotate(-${count * (360/33)}deg)`;
+            if (count === goal && count !== 0) {
+                playTargetAlert();
+                mainDisplay.style.color = "var(--gold-glow)";
+            } else {
+                mainDisplay.style.color = "#fff";
+            }
+            localStorage.setItem('mag_count', count);
+        }
 
-        document.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft') { moveState.left = false; } 
-            else if (e.key === 'ArrowRight') { moveState.right = false; }
-        });
+        volSlider.oninput = () => {
+            appVolume = volSlider.value;
+            localStorage.setItem('mag_vol', appVolume);
+        };
 
-        // Mobile / Touch Controls (Absolute Position Tracking)
-        touchArea.addEventListener('touchstart', (e) => {
-            e.preventDefault(); 
-            if (!isPlaying) return;
-            
-            const containerLeft = container.getBoundingClientRect().left;
-            const touchX = e.touches[0].clientX - containerLeft;
-            moveState.touchX = touchX; 
-            moveState.left = false; 
-            moveState.right = false; 
-        });
+        function toggleSound() {
+            isMuted = !isMuted;
+            localStorage.setItem('mag_mute', isMuted);
+            document.getElementById('soundBtn').innerText = isMuted ? '🔇 Off' : '🔊 On';
+        }
 
-        touchArea.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            if (!isPlaying) return;
-            
-            const containerLeft = container.getBoundingClientRect().left;
-            const touchX = e.touches[0].clientX - containerLeft;
-            moveState.touchX = touchX;
-        });
+        function shareApp() {
+            const text = `Divine Beads App: ${window.location.href}\nSadaqah-e-Jariyah!`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
 
-        touchArea.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            moveState.touchX = null;
-        });
+        document.getElementById('tapBtn').onclick = () => {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            count++; updateUI();
+        };
 
-        // Mobile Button Controls
-        document.getElementById('shoot-btn').addEventListener('touchstart', (e) => { 
-            e.preventDefault(); 
-            firePlayerBullet(); 
-        });
-        document.getElementById('shoot-btn').addEventListener('click', firePlayerBullet); 
+        function reset() { if(confirm("Reset Count?")) { count = 0; updateUI(); } }
+        function setGoal() { 
+            let g = prompt("Set Target:", goal); 
+            if(g) { goal = parseInt(g); updateUI(); localStorage.setItem('mag_goal', goal); } 
+        }
 
-        // Laser Button Control
-        laserButton.addEventListener('click', useSpecialWeapon);
-        laserButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            useSpecialWeapon();
-        });
-
-        // Left Button
-        document.getElementById('left-btn').addEventListener('touchstart', (e) => { 
-            e.preventDefault(); 
-            moveState.left = true; 
-            moveState.touchX = null; 
-        });
-        document.getElementById('left-btn').addEventListener('touchend', (e) => { 
-            e.preventDefault(); 
-            moveState.left = false; 
-        });
-
-        // Right Button
-        document.getElementById('right-btn').addEventListener('touchstart', (e) => { 
-            e.preventDefault(); 
-            moveState.right = true; 
-            moveState.touchX = null; 
-        });
-        document.getElementById('right-btn').addEventListener('touchend', (e) => { 
-            e.preventDefault(); 
-            moveState.right = false; 
-        });
-
-
-        // Start/Restart via message overlay click (initial setup)
-        messageOverlay.addEventListener('click', startGame, { once: true }); 
-
-        document.addEventListener('DOMContentLoaded', () => {
-             scoreBoard.textContent = '0';
-             livesDisplay.textContent = LIFE_EMOJI.repeat(lives);
-             highScoreDisplay.textContent = `${highScore}`;
-             muteButton.textContent = isMuted ? '🔇' : '🔊'; 
-             applyTheme('forest'); 
-             
-             // Initial Zone Setup
-             playzone.style.width = `${containerWidth}px`;
-             playzone.style.height = `${containerHeight}px`;
-             playzone.style.left = `0px`;
-             playzone.style.top = `0px`;
-        });
+        const malaWrap = document.getElementById('malaWrap');
+        for (let i = 0; i < 33; i++) {
+            const b = document.createElement('div');
+            b.className = 'bead';
+            b.style.transform = `translateX(-50%) rotate(${i * (360/33)}deg)`;
+            malaWrap.appendChild(b);
+        }
+        updateUI();
     </script>
 </body>
 </html>
