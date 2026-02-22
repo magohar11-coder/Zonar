@@ -30,49 +30,64 @@
             100% { border-color: #00d2ff; box-shadow: 0 0 20px #00d2ff, inset 0 0 10px #00d2ff; }
         }
 
+        @keyframes buttonPulse {
+            0% { border-color: rgba(0, 210, 255, 0.5); box-shadow: 0 0 5px rgba(0, 210, 255, 0.2); }
+            50% { border-color: var(--gold-glow); box-shadow: 0 0 15px var(--gold-glow); }
+            100% { border-color: rgba(0, 210, 255, 0.5); box-shadow: 0 0 5px rgba(0, 210, 255, 0.2); }
+        }
+
         .phone-frame {
             background: var(--card-bg);
-            width: 90vw; max-width: 340px; height: 92vh; max-height: 700px;
-            padding: 20px 15px; border-radius: 40px; text-align: center;
-            position: relative; border: 6px solid #1e293b; 
+            width: 90vw; 
+            max-width: 340px;
+            height: 92vh;
+            max-height: 700px;
+            padding: 20px 15px;
+            border-radius: 40px; 
+            text-align: center;
+            position: relative; 
+            border: 6px solid #1e293b; 
             animation: neonBorderGlow 5s linear infinite;
-            display: flex; flex-direction: column; justify-content: space-around;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
             box-sizing: border-box;
         }
 
         .top-container { display: flex; justify-content: space-between; align-items: center; padding: 0 5px; }
         .side-btn { 
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1);
             color: white; padding: 8px 12px; border-radius: 12px; font-size: 0.65rem; cursor: pointer;
+            animation: buttonPulse 3s infinite ease-in-out;
         }
 
-        .stats-box {
-            background: rgba(0, 210, 255, 0.05);
-            border: 1px solid rgba(0, 210, 255, 0.3);
-            border-radius: 8px; padding: 6px; margin: 4px 0;
-            font-size: 0.75rem; display: flex; justify-content: space-around;
+        /* Firebase Stats Style */
+        .live-stats {
+            font-size: 0.7rem;
+            color: var(--text-gray);
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: -10px;
         }
-
-        .volume-control { margin: 5px 0; }
+        
         .volume-control input { width: 80px; accent-color: var(--gold-glow); }
 
         .header-stats { display: flex; justify-content: space-between; padding: 0 10px; font-size: 0.85rem; color: var(--text-gray); }
-
+        
         .ring-container {
-            position: relative; width: 200px; height: 200px; 
-            margin: 10px auto; display: flex; justify-content: center; align-items: center;
+            position: relative; 
+            width: 180px; 
+            height: 180px; 
+            margin: 5px auto;
+            display: flex; justify-content: center; align-items: center;
         }
 
-        .mala-beads-wrap {
-            position: absolute; width: 100%; height: 100%;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
         .bead {
-            position: absolute; width: 12px; height: 12px;
+            position: absolute; width: 10px; height: 10px;
             background: radial-gradient(circle at 30% 30%, #fff, var(--bead-color));
-            border-radius: 50%; left: 50%; top: 0;
-            transform-origin: 0px 100px;
-            box-shadow: 0 0 5px var(--bead-color);
+            border-radius: 50%; left: 50%; top: 0; transform-origin: 50% 90px;
         }
 
         .total-display { font-size: 3.5rem; font-weight: 100; margin: 0; z-index: 10; color: #fff; }
@@ -82,58 +97,62 @@
             background: radial-gradient(circle at 35% 35%, #fcd34d 0%, #b28924 100%);
             box-shadow: 0 10px 25px rgba(0,0,0,0.6);
             cursor: pointer; display: flex; justify-content: center; align-items: center; 
-            margin: 5px auto; outline: none; -webkit-tap-highlight-color: transparent;
+            margin: 5px auto; outline: none; flex-shrink: 0;
         }
-        .dhikr-btn:active { transform: scale(0.95); }
 
-        marquee { font-size: 0.7rem; color: var(--text-gray); margin: 5px 0; }
+        @media (max-height: 600px) {
+            .ring-container { width: 150px; height: 150px; }
+            .bead { transform-origin: 50% 75px; }
+            .dhikr-btn { width: 100px; height: 100px; }
+            .total-display { font-size: 2.5rem; }
+        }
     </style>
 </head>
 <body>
 
     <div class="phone-frame">
         <div class="top-container">
-            <button class="side-btn" id="resetBtn">RESET</button>
-            <button class="side-btn" id="targetBtn">TARGET</button>
+            <button class="side-btn" onclick="reset()">RESET</button>
+            <button class="side-btn" onclick="setGoal()">TARGET</button>
         </div>
 
         <div class="branding-header">
-            <div style="font-size: 1.5rem; letter-spacing: 2px;">DIVINE BEADS</div>
-            <div style="font-size: 1.5rem; margin: 5px 0;">پاک تسبیح</div>
-            <div style="font-size: 0.9rem; font-weight: bold; color: var(--gold-glow);">Powered By M.A.Gohar</div>
+            <font size="5">DIVINE BEADS</font>
+            <p><font size="5">پاک تسبیح</font></p>
+            <p><b><font size="4">Powered By M.A.Gohar</font></b></p>
         </div>
 
-        <div class="stats-box">
-            <span>👥 Install: <b id="totalUsers" style="color:#00d2ff">...</b></span>
-            <span>💧 Online: <b id="onlineUsers" style="color:#f3ba2f">...</b></span>
+        <div class="live-stats">
+            <span>Users: <b id="totalUsers" style="color:#00d2ff">...</b></span>
+            <span>Online: <b id="onlineUsers" style="color:var(--gold-glow)">...</b></span>
         </div>
 
-        <marquee scrollamount="3">Sadaqah-e-Jariyah: Share App And earn the Reward | 100% Secure & Family Safe</marquee>
+        <marquee>Sadaqah-e-Jariyah: Share App And earn the Reward till the time of Qayamah; this is 100% secure App No Adult Ads | 100% Family & Child Safe ! you don't need to give its any phone's Permission |follow us on Instagram: (goha.r7776) or Email us dialanddeal78@gmail.com (9927530866)for more info</marquee>
 
         <div class="volume-control">
-            <span>🔈</span>
+            <span style="font-size: 0.6rem;">🔈</span>
             <input type="range" id="volSlider" min="0" max="1" step="0.1" value="0.5">
-            <span>🔊</span>
+            <span style="font-size: 0.6rem;">🔊</span>
         </div>
 
         <div class="header-stats">
-            <div style="text-align: left;">
+            <div class="stat-col" style="text-align: left;">
                 <span>Today: <b id="todayCount" style="color:#fff">0</b></span>
-                <div class="side-btn" id="soundBtn" style="padding: 3px 6px; margin-top: 5px;">🔊 On</div>
+                <div class="side-btn" id="soundBtn" onclick="toggleSound()" style="padding: 3px 6px; margin-top: 5px;">🔊 On</div>
             </div>
-            <div style="text-align: right;">
+            <div class="stat-col" style="text-align: right;">
                 <span>Target: <b id="targetLabel" style="color:#fff">100</b></span>
-                <div class="side-btn" id="shareBtn" style="padding: 3px 6px; margin-top: 5px;">🔗 Share</div>
+                <div class="side-btn" onclick="shareApp()" style="padding: 3px 6px; margin-top: 5px;">🔗 Share</div>
             </div>
         </div>
 
         <div class="ring-container">
-            <div class="mala-beads-wrap" id="malaWrap"></div>
+            <div class="mala-beads-wrap" id="malaWrap" style="position: absolute; width: 100%; height: 100%; transition: transform 0.3s;"></div>
             <h1 class="total-display" id="mainCounter">0</h1>
         </div>
 
         <button class="dhikr-btn" id="tapBtn">
-            <span style="font-size: 1.1rem; color: #4a3700; font-weight: 900;">PRESS</span>
+            <span style="font-size: 1rem; color: #4a3700; font-weight: 900;">PRESS</span>
         </button>
     </div>
 
@@ -154,100 +173,94 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // State
+        // Tracking Logic
+        const totalRef = ref(db, 'stats/total_users');
+        const onlineRef = ref(db, 'stats/online_now');
+
+        if (!localStorage.getItem('mag_user_id')) {
+            runTransaction(totalRef, (curr) => (curr || 0) + 1);
+            localStorage.setItem('mag_user_id', 'true');
+        }
+
+        onValue(totalRef, (snap) => { document.getElementById('totalUsers').innerText = snap.val() || 0; });
+        runTransaction(onlineRef, (curr) => (curr || 0) + 1);
+        onDisconnect(onlineRef).runTransaction((curr) => (curr > 0 ? curr - 1 : 0));
+        onValue(onlineRef, (snap) => { document.getElementById('onlineUsers').innerText = snap.val() || 1; });
+    </script>
+
+    <script>
         let count = parseInt(localStorage.getItem('mag_count')) || 0;
         let goal = parseInt(localStorage.getItem('mag_goal')) || 100;
         let isMuted = localStorage.getItem('mag_mute') === 'true';
         let appVolume = parseFloat(localStorage.getItem('mag_vol')) || 0.5;
 
+        const mainDisplay = document.getElementById('mainCounter');
+        const volSlider = document.getElementById('volSlider');
+        volSlider.value = appVolume;
+
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-        function playTing() {
-            if (isMuted) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
-            gain.gain.setValueAtTime(appVolume, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.5);
-        }
-
+        
         function playTargetAlert() {
-            let times = 0;
-            const interval = setInterval(() => {
-                playTing();
-                times++;
-                if (times >= 3) clearInterval(interval);
-            }, 300);
-            if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
+            if (isMuted) return;
+            const playSound = () => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
+                gain.gain.setValueAtTime(appVolume, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 1);
+            };
+            playSound();
+            setTimeout(playSound, 1100);
+            if (navigator.vibrate) {
+                navigator.vibrate([400, 200, 400, 200, 400]); 
+            }
         }
 
         function updateUI() {
-            document.getElementById('mainCounter').innerText = count;
+            mainDisplay.innerText = count;
             document.getElementById('todayCount').innerText = count;
             document.getElementById('targetLabel').innerText = goal;
             document.getElementById('malaWrap').style.transform = `rotate(-${count * (360/33)}deg)`;
-            
-            // STRICT TARGET ONLY SOUND:
-            if (count > 0 && count % goal === 0) {
+            if (count === goal && count !== 0) {
                 playTargetAlert();
-                document.getElementById('mainCounter').style.color = "var(--gold-glow)";
+                mainDisplay.style.color = "var(--gold-glow)";
             } else {
-                document.getElementById('mainCounter').style.color = "#fff";
+                mainDisplay.style.color = "#fff";
             }
             localStorage.setItem('mag_count', count);
         }
 
-        // Tap Logic
-        document.getElementById('tapBtn').onclick = () => {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            count++;
-            updateUI();
-        };
-
-        // Controls
-        document.getElementById('resetBtn').onclick = () => {
-            if(confirm("Reset Count?")) { count = 0; updateUI(); }
-        };
-
-        document.getElementById('targetBtn').onclick = () => {
-            let g = prompt("Set Target:", goal);
-            if(g && !isNaN(g)) { goal = parseInt(g); updateUI(); localStorage.setItem('mag_goal', goal); }
-        };
-
-        document.getElementById('soundBtn').onclick = () => {
-            isMuted = !isMuted;
-            localStorage.setItem('mag_mute', isMuted);
-            document.getElementById('soundBtn').innerText = isMuted ? '🔇 Off' : '🔊 On';
-        };
-
-        document.getElementById('volSlider').oninput = (e) => {
-            appVolume = e.target.value;
+        volSlider.oninput = () => {
+            appVolume = volSlider.value;
             localStorage.setItem('mag_vol', appVolume);
         };
 
-        document.getElementById('shareBtn').onclick = () => {
-            const text = `Divine Beads App: ${window.location.href}`;
+        function toggleSound() {
+            isMuted = !isMuted;
+            localStorage.setItem('mag_mute', isMuted);
+            document.getElementById('soundBtn').innerText = isMuted ? '🔇 Off' : '🔊 On';
+        }
+
+        function shareApp() {
+            const text = `Divine Beads App: ${window.location.href}\nSadaqah-e-Jariyah!`;
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        document.getElementById('tapBtn').onclick = () => {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            count++; updateUI();
         };
 
-        // Firebase Sync
-        const totalRef = ref(db, 'stats/total_users');
-        const onlineRef = ref(db, 'stats/online_now');
-
-        if (!localStorage.getItem('mag_registered')) {
-            runTransaction(totalRef, (c) => (c || 0) + 1);
-            localStorage.setItem('mag_registered', 'true');
+        function reset() { if(confirm("Reset Count?")) { count = 0; updateUI(); } }
+        function setGoal() { 
+            let g = prompt("Set Target:", goal); 
+            if(g) { goal = parseInt(g); updateUI(); localStorage.setItem('mag_goal', goal); } 
         }
-        onValue(totalRef, (s) => { document.getElementById('totalUsers').innerText = s.val() || 0; });
-        runTransaction(onlineRef, (c) => (c || 0) + 1);
-        onDisconnect(onlineRef).runTransaction((c) => (c > 0 ? c - 1 : 0));
-        onValue(onlineRef, (s) => { document.getElementById('onlineUsers').innerText = s.val() || 1; });
 
-        // Build Mala
         const malaWrap = document.getElementById('malaWrap');
         for (let i = 0; i < 33; i++) {
             const b = document.createElement('div');
@@ -255,10 +268,6 @@
             b.style.transform = `translateX(-50%) rotate(${i * (360/33)}deg)`;
             malaWrap.appendChild(b);
         }
-
-        // Init
-        document.getElementById('volSlider').value = appVolume;
-        document.getElementById('soundBtn').innerText = isMuted ? '🔇 Off' : '🔊 On';
         updateUI();
     </script>
 </body>
