@@ -35,10 +35,9 @@
         .side-btn { 
             background: rgba(255,215,0,0.1); border: 1px solid #f3ba2f;
             color: #f3ba2f; padding: 8px 15px; border-radius: 12px; font-size: 0.7rem; cursor: pointer;
-            box-shadow: 0 0 5px #f3ba2f;
+            box-shadow: 0 0 5px #f3ba2f; outline: none;
         }
 
-        /* Pic style Facebook Stats Boxes */
         .stats-box {
             background: rgba(0, 210, 255, 0.05);
             border: 1px solid rgba(0, 210, 255, 0.3);
@@ -57,10 +56,11 @@
             background: radial-gradient(circle at 35% 35%, #fcd34d 0%, #b28924 100%); 
             box-shadow: 0 10px 25px rgba(0,0,0,0.8); cursor: pointer; 
             border: none; outline: none; display: flex; justify-content: center; align-items: center;
-            margin: 0 auto 10px;
+            margin: 0 auto 10px; -webkit-tap-highlight-color: transparent;
         }
 
-        .press-text { font-size: 1.1rem; color: #332600; font-weight: 900; }
+        .dhikr-btn:active { transform: scale(0.95); }
+        .press-text { font-size: 1.1rem; color: #332600; font-weight: 900; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -78,19 +78,19 @@
         </div>
 
         <div class="stats-box">
-            <span>👥 Community: <b id="totalUsers" style="color:#00d2ff">...</b></span>
-            <span>💧 Online Users: <b id="onlineUsers" style="color:#f3ba2f">...</b></span>
+            <span>👥 Community: <b id="totalUsers" style="color:#00d2ff">0</b></span>
+            <span>💧 Online Users: <b id="onlineUsers" style="color:#f3ba2f">1</b></span>
         </div>
 
         <p style="font-size: 0.7rem; margin: 0; color: #94a3b8;">Sadaqah-e-Jariyah: Share App And earn the Reward!</p>
 
         <div class="header-stats">
-            <div>Today: <b id="todayCount">0</b><br><span class="side-btn" id="soundBtn" style="padding:2px 8px; font-size:0.6rem;">🔊 On</span></div>
-            <div>Target: <b id="targetLabel">10</b><br><span class="side-btn" id="shareBtn" style="padding:2px 8px; font-size:0.6rem;">🔗 Share</span></div>
+            <div>Today: <b id="todayCount">0</b><br><button class="side-btn" id="soundBtn" style="padding:2px 8px; font-size:0.6rem; margin-top:5px;">🔊 On</button></div>
+            <div>Target: <b id="targetLabel">10</b><br><button class="side-btn" id="shareBtn" style="padding:2px 8px; font-size:0.6rem; margin-top:5px;">🔗 Share</button></div>
         </div>
 
         <div class="ring-container">
-            <div id="malaWrap" style="position: absolute; width: 100%; height: 100%; transition: transform 0.3s;"></div>
+            <div id="malaWrap" style="position: absolute; width: 100%; height: 100%; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);"></div>
             <h1 class="total-display" id="mainCounter">0</h1>
         </div>
 
@@ -114,63 +114,93 @@
             measurementId: "G-L11D16MBR7"
         };
 
+        // Fast Load Initialization
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Firebase Stats Logic
-        const totalRef = ref(db, 'stats/total_users');
-        const onlineRef = ref(db, 'stats/online_now');
-
-        if (!localStorage.getItem('mag_user')) {
-            runTransaction(totalRef, (c) => (c || 0) + 1);
-            localStorage.setItem('mag_user', 'true');
-        }
-        onValue(totalRef, (s) => { document.getElementById('totalUsers').innerText = s.val() || 0; });
-
-        runTransaction(onlineRef, (c) => (c || 0) + 1);
-        onDisconnect(onlineRef).runTransaction((c) => (c > 0 ? c - 1 : 0));
-        onValue(onlineRef, (s) => { document.getElementById('onlineUsers').innerText = s.val() || 0; });
-
-        // App Functions
+        // State Management
         let count = parseInt(localStorage.getItem('mag_count')) || 0;
         let goal = parseInt(localStorage.getItem('mag_goal')) || 10;
-        let isMuted = false;
+        let isMuted = localStorage.getItem('mag_mute') === 'true';
 
+        // Elements
+        const mainCounter = document.getElementById('mainCounter');
+        const todayCount = document.getElementById('todayCount');
+        const targetLabel = document.getElementById('targetLabel');
+        const malaWrap = document.getElementById('malaWrap');
+        const soundBtn = document.getElementById('soundBtn');
+
+        // Fast UI Update Function
         const updateUI = () => {
-            document.getElementById('mainCounter').innerText = count;
-            document.getElementById('todayCount').innerText = count;
-            document.getElementById('targetLabel').innerText = goal;
-            document.getElementById('malaWrap').style.transform = `rotate(-${count * (360/33)}deg)`;
+            mainCounter.innerText = count;
+            todayCount.innerText = count;
+            targetLabel.innerText = goal;
+            malaWrap.style.transform = `rotate(-${count * (360/33)}deg)`;
             localStorage.setItem('mag_count', count);
         };
 
-        document.getElementById('tapBtn').onclick = () => {
-            count++; updateUI();
-            if (navigator.vibrate) navigator.vibrate(50);
-        };
+        // --- BUTTONS CONNECTIONS (FIXED) ---
+        document.getElementById('tapBtn').addEventListener('click', () => {
+            count++;
+            updateUI();
+            if (navigator.vibrate) navigator.vibrate(40);
+        });
 
-        document.getElementById('resetBtn').onclick = () => {
-            if(confirm("Reset?")) { count = 0; updateUI(); }
-        };
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            if(confirm("Reset Count?")) {
+                count = 0;
+                updateUI();
+            }
+        });
 
-        document.getElementById('targetBtn').onclick = () => {
-            let g = prompt("Set Target:", goal);
-            if(g) { goal = parseInt(g); updateUI(); localStorage.setItem('mag_goal', goal); }
-        };
+        document.getElementById('targetBtn').addEventListener('click', () => {
+            let g = prompt("Set New Target:", goal);
+            if(g && !isNaN(g)) {
+                goal = parseInt(g);
+                updateUI();
+                localStorage.setItem('mag_goal', goal);
+            }
+        });
 
-        document.getElementById('shareBtn').onclick = () => {
-            window.open('https://wa.me/?text=Divine Beads App: Sadaqah-e-Jariyah!', '_blank');
-        };
+        document.getElementById('soundBtn').addEventListener('click', () => {
+            isMuted = !isMuted;
+            localStorage.setItem('mag_mute', isMuted);
+            soundBtn.innerText = isMuted ? '🔇 Off' : '🔊 On';
+        });
 
-        // Create Beads Circle
-        const malaWrap = document.getElementById('malaWrap');
+        document.getElementById('shareBtn').addEventListener('click', () => {
+            const text = encodeURIComponent("Divine Beads: Sadaqah-e-Jariyah! Download now to start your Dhikr.");
+            window.open(`https://wa.me/?text=${text}`, '_blank');
+        });
+
+        // --- FIREBASE LOGIC ---
+        const totalRef = ref(db, 'stats/total_users');
+        const onlineRef = ref(db, 'stats/online_now');
+
+        // Instant Community Join
+        if (!localStorage.getItem('mag_registered')) {
+            runTransaction(totalRef, (c) => (c || 0) + 1);
+            localStorage.setItem('mag_registered', 'true');
+        }
+
+        // Live Listeners
+        onValue(totalRef, (s) => { document.getElementById('totalUsers').innerText = s.val() || 0; });
+        
+        runTransaction(onlineRef, (c) => (c || 0) + 1);
+        onDisconnect(onlineRef).runTransaction((c) => (c > 0 ? c - 1 : 0));
+        onValue(onlineRef, (s) => { document.getElementById('onlineUsers').innerText = s.val() || 1; });
+
+        // Initialize Beads Circle
         for (let i = 0; i < 33; i++) {
             const b = document.createElement('div');
             b.className = 'bead';
             b.style.transform = `translateX(-50%) rotate(${i * (360/33)}deg)`;
             malaWrap.appendChild(b);
         }
+
+        // Initial UI Load
         updateUI();
+        soundBtn.innerText = isMuted ? '🔇 Off' : '🔊 On';
     </script>
 </body>
 </html>
