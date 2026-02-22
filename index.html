@@ -30,78 +30,40 @@
             100% { border-color: #00d2ff; box-shadow: 0 0 20px #00d2ff, inset 0 0 10px #00d2ff; }
         }
 
-        @keyframes buttonPulse {
-            0% { border-color: rgba(0, 210, 255, 0.5); box-shadow: 0 0 5px rgba(0, 210, 255, 0.2); }
-            50% { border-color: var(--gold-glow); box-shadow: 0 0 15px var(--gold-glow); }
-            100% { border-color: rgba(0, 210, 255, 0.5); box-shadow: 0 0 5px rgba(0, 210, 255, 0.2); }
-        }
-
-        /* AUTO-FIT PHONE FRAME */
         .phone-frame {
             background: var(--card-bg);
-            width: 90vw; 
-            max-width: 340px;
-            height: 92vh;
-            max-height: 700px;
-            padding: 20px 15px;
-            border-radius: 40px; 
-            text-align: center;
-            position: relative; 
-            border: 6px solid #1e293b; 
+            width: 90vw; max-width: 340px; height: 92vh; max-height: 700px;
+            padding: 20px 15px; border-radius: 40px; text-align: center;
+            position: relative; border: 6px solid #1e293b; 
             animation: neonBorderGlow 5s linear infinite;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around; /* Elements ke beech gap auto-adjust hoga */
+            display: flex; flex-direction: column; justify-content: space-around;
             box-sizing: border-box;
         }
 
-        /* TOP BUTTONS RESPONSIVE */
-        .top-container { display: flex; justify-content: space-between; align-items: center; padding: 0 5px; }
+        .top-container { display: flex; justify-content: space-between; align-items: center; }
         .side-btn { 
-            background: rgba(255,255,255,0.05); 
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
             color: white; padding: 8px 12px; border-radius: 12px; font-size: 0.65rem; cursor: pointer;
-            animation: buttonPulse 3s infinite ease-in-out;
         }
 
-        
-        .volume-control input { width: 80px; accent-color: var(--gold-glow); }
+        /* FACEBOOK STYLE STATS */
+        .live-stats-bar {
+            background: rgba(0, 210, 255, 0.1);
+            border-radius: 10px; padding: 8px; margin: 10px 0;
+            font-size: 0.7rem; display: flex; justify-content: space-around;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+        }
 
         .header-stats { display: flex; justify-content: space-between; padding: 0 10px; font-size: 0.85rem; color: var(--text-gray); }
-        
-        /* RING SIZE AUTO-ADJUST */
-        .ring-container {
-            position: relative; 
-            width: 180px; 
-            height: 180px; 
-            margin: 5px auto;
-            display: flex; justify-content: center; align-items: center;
-        }
-
-        .bead {
-            position: absolute; width: 10px; height: 10px;
-            background: radial-gradient(circle at 30% 30%, #fff, var(--bead-color));
-            border-radius: 50%; left: 50%; top: 0; transform-origin: 50% 90px;
-        }
-
+        .ring-container { position: relative; width: 180px; height: 180px; margin: 5px auto; display: flex; justify-content: center; align-items: center; }
+        .bead { position: absolute; width: 10px; height: 10px; background: radial-gradient(circle at 30% 30%, #fff, var(--bead-color)); border-radius: 50%; left: 50%; top: 0; transform-origin: 50% 90px; }
         .total-display { font-size: 3.5rem; font-weight: 100; margin: 0; z-index: 10; color: #fff; }
-
-        /* MAIN BUTTON RESPONSIVE */
-        .dhikr-btn {
-            width: 120px; height: 120px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.1);
-            background: radial-gradient(circle at 35% 35%, #fcd34d 0%, #b28924 100%);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-            cursor: pointer; display: flex; justify-content: center; align-items: center; 
-            margin: 5px auto; outline: none; flex-shrink: 0;
-        }
-
-        /* Responsive Fix for Small Screens */
+        .dhikr-btn { width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fcd34d 0%, #b28924 100%); box-shadow: 0 10px 25px rgba(0,0,0,0.6); cursor: pointer; display: flex; justify-content: center; align-items: center; margin: 5px auto; outline: none; flex-shrink: 0; }
+        
         @media (max-height: 600px) {
-            .app-title { font-size: 0.9rem; }
             .ring-container { width: 150px; height: 150px; }
             .bead { transform-origin: 50% 75px; }
             .dhikr-btn { width: 100px; height: 100px; }
-            .total-display { font-size: 2.5rem; }
         }
     </style>
 </head>
@@ -114,18 +76,16 @@
         </div>
 
         <div class="branding-header">
-            <Font SIZE="5">DIVINE BEADS</font>
-          <p>  <font size="5">پاک تسبیح</font></p>
-          <p> <b><font size="4">Powered By M.A.Gohar</b>
+            <font size="5">DIVINE BEADS</font><br>
+            <font size="4">Powered By M.A.Gohar</font>
         </div>
 
-        <marquee>Sadaqah-e-Jariyah: Share App And earn the Reward till the time of Qayamah; this is 100% secure App No Adult Ads | 100% Family & Child Safe ! you don't need to give its any phone's Permission |follow us on Instagram: (goha.r7776) or Email us dialanddeal78@gmail.com (9927530866)for more info</marquee>
-
-        <div class="volume-control">
-            <span style="font-size: 0.6rem;">🔈</span>
-            <input type="range" id="volSlider" min="0" max="1" step="0.1" value="0.5">
-            <span style="font-size: 0.6rem;">🔊</span>
+        <div class="live-stats-bar">
+            <span>👥 Community: <b id="totalUsers" style="color:#00d2ff">...</b></span>
+            <span>🔥 Active: <b id="onlineUsers" style="color:#f3ba2f">...</b></span>
         </div>
+
+        <marquee style="font-size: 0.7rem; color: var(--text-gray);">Sadaqah-e-Jariyah: Share App And earn the Reward! 100% Family Safe.</marquee>
 
         <div class="header-stats">
             <div class="stat-col" style="text-align: left;">
@@ -148,78 +108,61 @@
         </button>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-database-compat.js"></script>
+
     <script>
+        // Aapka Config jo maine set kiya hai
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqM0KiV0K29BIFLmRoQoX2KUVdtChrwXE",
+            authDomain: "divine-beads.firebaseapp.com",
+            databaseURL: "https://divine-beads-default-rtdb.firebaseio.com",
+            projectId: "divine-beads",
+            storageBucket: "divine-beads.firebasestorage.app",
+            messagingSenderId: "589482198444",
+            appId: "1:589482198444:web:1a3343eea6ef775fd4a609",
+            measurementId: "G-L11D16MBR7"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // 1. Total Installs Tracking
+        if (!localStorage.getItem('mag_user_id')) {
+            const newId = Date.now();
+            localStorage.setItem('mag_user_id', newId);
+            db.ref('stats/total_users').transaction(curr => (curr || 0) + 1);
+        }
+        db.ref('stats/total_users').on('value', s => { document.getElementById('totalUsers').innerText = s.val() || 0; });
+
+        // 2. Live Activity Tracking
+        const onlineRef = db.ref('stats/online_now');
+        onlineRef.transaction(curr => (curr || 0) + 1);
+        onlineRef.onDisconnect().transaction(curr => (curr > 0 ? curr - 1 : 0));
+        onlineRef.on('value', s => { document.getElementById('onlineUsers').innerText = s.val() || 0; });
+
+        // --- PURANA APP LOGIC ---
         let count = parseInt(localStorage.getItem('mag_count')) || 0;
         let goal = parseInt(localStorage.getItem('mag_goal')) || 100;
         let isMuted = localStorage.getItem('mag_mute') === 'true';
-        let appVolume = parseFloat(localStorage.getItem('mag_vol')) || 0.5;
-
-        const mainDisplay = document.getElementById('mainCounter');
-        const volSlider = document.getElementById('volSlider');
-        volSlider.value = appVolume;
-
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        function playTargetAlert() {
-            if (isMuted) return;
-            const playSound = () => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
-                gain.gain.setValueAtTime(appVolume, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 1);
-            };
-            playSound();
-            setTimeout(playSound, 1100);
-            if (navigator.vibrate) {
-                navigator.vibrate([400, 200, 400, 200, 400]); 
-            }
-        }
 
         function updateUI() {
-            mainDisplay.innerText = count;
+            document.getElementById('mainCounter').innerText = count;
             document.getElementById('todayCount').innerText = count;
             document.getElementById('targetLabel').innerText = goal;
             document.getElementById('malaWrap').style.transform = `rotate(-${count * (360/33)}deg)`;
-            if (count === goal && count !== 0) {
-                playTargetAlert();
-                mainDisplay.style.color = "var(--gold-glow)";
-            } else {
-                mainDisplay.style.color = "#fff";
-            }
             localStorage.setItem('mag_count', count);
         }
 
-        volSlider.oninput = () => {
-            appVolume = volSlider.value;
-            localStorage.setItem('mag_vol', appVolume);
-        };
-
-        function toggleSound() {
-            isMuted = !isMuted;
-            localStorage.setItem('mag_mute', isMuted);
-            document.getElementById('soundBtn').innerText = isMuted ? '🔇 Off' : '🔊 On';
-        }
-
-        function shareApp() {
-            const text = `Divine Beads App: ${window.location.href}\nSadaqah-e-Jariyah!`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-        }
-
         document.getElementById('tapBtn').onclick = () => {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
             count++; updateUI();
+            if (navigator.vibrate) navigator.vibrate(50);
         };
 
-        function reset() { if(confirm("Reset Count?")) { count = 0; updateUI(); } }
-        function setGoal() { 
-            let g = prompt("Set Target:", goal); 
-            if(g) { goal = parseInt(g); updateUI(); localStorage.setItem('mag_goal', goal); } 
-        }
+        function reset() { if(confirm("Reset?")) { count = 0; updateUI(); } }
+        function setGoal() { let g = prompt("Target:", goal); if(g) { goal = parseInt(g); updateUI(); localStorage.setItem('mag_goal', goal); } }
+        function toggleSound() { isMuted = !isMuted; localStorage.setItem('mag_mute', isMuted); document.getElementById('soundBtn').innerText = isMuted ? '🔇 Off' : '🔊 On'; }
+        function shareApp() { window.open(`https://wa.me/?text=Divine Beads App: Sadaqah-e-Jariyah!`, '_blank'); }
 
         const malaWrap = document.getElementById('malaWrap');
         for (let i = 0; i < 33; i++) {
