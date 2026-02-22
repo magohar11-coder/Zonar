@@ -59,7 +59,7 @@
             margin: 0 auto 10px; -webkit-tap-highlight-color: transparent;
         }
 
-        .dhikr-btn:active { transform: scale(0.95); }
+        .dhikr-btn:active { transform: scale(0.95); transition: 0.1s; }
         .press-text { font-size: 1.1rem; color: #332600; font-weight: 900; pointer-events: none; }
     </style>
 </head>
@@ -78,8 +78,8 @@
         </div>
 
         <div class="stats-box">
-            <span>👥 Community: <b id="totalUsers" style="color:#00d2ff">0</b></span>
-            <span>💧 Online Users: <b id="onlineUsers" style="color:#f3ba2f">1</b></span>
+            <span>👥 Community: <b id="totalUsers" style="color:#00d2ff">...</b></span>
+            <span>💧 Online Users: <b id="onlineUsers" style="color:#f3ba2f">...</b></span>
         </div>
 
         <p style="font-size: 0.7rem; margin: 0; color: #94a3b8;">Sadaqah-e-Jariyah: Share App And earn the Reward!</p>
@@ -114,83 +114,97 @@
             measurementId: "G-L11D16MBR7"
         };
 
-        // Fast Load Initialization
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // State Management
+        // State initialization - FAST
         let count = parseInt(localStorage.getItem('mag_count')) || 0;
         let goal = parseInt(localStorage.getItem('mag_goal')) || 10;
         let isMuted = localStorage.getItem('mag_mute') === 'true';
 
-        // Elements
-        const mainCounter = document.getElementById('mainCounter');
-        const todayCount = document.getElementById('todayCount');
-        const targetLabel = document.getElementById('targetLabel');
-        const malaWrap = document.getElementById('malaWrap');
-        const soundBtn = document.getElementById('soundBtn');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playTing() {
+            if (isMuted) return;
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.frequency.value = 1200; osc.type = 'sine';
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+        }
 
-        // Fast UI Update Function
         const updateUI = () => {
-            mainCounter.innerText = count;
-            todayCount.innerText = count;
-            targetLabel.innerText = goal;
-            malaWrap.style.transform = `rotate(-${count * (360/33)}deg)`;
+            document.getElementById('mainCounter').innerText = count;
+            document.getElementById('todayCount').innerText = count;
+            document.getElementById('targetLabel').innerText = goal;
+            document.getElementById('malaWrap').style.transform = `rotate(-${count * (360/33)}deg)`;
             localStorage.setItem('mag_count', count);
         };
 
-        // --- BUTTONS CONNECTIONS (FIXED) ---
+        // Handle Tap Logic
         document.getElementById('tapBtn').addEventListener('click', () => {
             count++;
             updateUI();
-            if (navigator.vibrate) navigator.vibrate(40);
+            
+            // Vibration on every tap
+            if (navigator.vibrate) navigator.vibrate(30);
+
+            // Target reached logic
+            if (count % goal === 0) {
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
+                let playCount = 0;
+                let interval = setInterval(() => {
+                    playTing();
+                    playCount++;
+                    if (playCount >= 3) clearInterval(interval);
+                }, 300);
+            }
         });
 
         document.getElementById('resetBtn').addEventListener('click', () => {
-            if(confirm("Reset Count?")) {
+            if(confirm("Confirm Reset?")) {
                 count = 0;
                 updateUI();
             }
         });
 
         document.getElementById('targetBtn').addEventListener('click', () => {
-            let g = prompt("Set New Target:", goal);
-            if(g && !isNaN(g)) {
+            let g = prompt("Set Target (Current: " + goal + ")", goal);
+            if(g && !isNaN(g) && g > 0) {
                 goal = parseInt(g);
-                updateUI();
                 localStorage.setItem('mag_goal', goal);
+                updateUI();
             }
         });
 
-        document.getElementById('soundBtn').addEventListener('click', () => {
+        document.getElementById('soundBtn').addEventListener('click', (e) => {
             isMuted = !isMuted;
             localStorage.setItem('mag_mute', isMuted);
-            soundBtn.innerText = isMuted ? '🔇 Off' : '🔊 On';
+            e.target.innerText = isMuted ? '🔇 Off' : '🔊 On';
+            if (!isMuted) playTing();
         });
 
         document.getElementById('shareBtn').addEventListener('click', () => {
-            const text = encodeURIComponent("Divine Beads: Sadaqah-e-Jariyah! Download now to start your Dhikr.");
-            window.open(`https://wa.me/?text=${text}`, '_blank');
+            window.open('https://wa.me/?text=Divine Beads: Sadaqah-e-Jariyah! Join me.', '_blank');
         });
 
-        // --- FIREBASE LOGIC ---
+        // Firebase Stats
         const totalRef = ref(db, 'stats/total_users');
         const onlineRef = ref(db, 'stats/online_now');
 
-        // Instant Community Join
         if (!localStorage.getItem('mag_registered')) {
             runTransaction(totalRef, (c) => (c || 0) + 1);
             localStorage.setItem('mag_registered', 'true');
         }
-
-        // Live Listeners
         onValue(totalRef, (s) => { document.getElementById('totalUsers').innerText = s.val() || 0; });
-        
         runTransaction(onlineRef, (c) => (c || 0) + 1);
         onDisconnect(onlineRef).runTransaction((c) => (c > 0 ? c - 1 : 0));
         onValue(onlineRef, (s) => { document.getElementById('onlineUsers').innerText = s.val() || 1; });
 
-        // Initialize Beads Circle
+        // Init Mala
+        const malaWrap = document.getElementById('malaWrap');
         for (let i = 0; i < 33; i++) {
             const b = document.createElement('div');
             b.className = 'bead';
@@ -198,9 +212,8 @@
             malaWrap.appendChild(b);
         }
 
-        // Initial UI Load
         updateUI();
-        soundBtn.innerText = isMuted ? '🔇 Off' : '🔊 On';
+        document.getElementById('soundBtn').innerText = isMuted ? '🔇 Off' : '🔊 On';
     </script>
 </body>
 </html>
