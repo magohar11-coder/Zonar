@@ -118,12 +118,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Persistent State
         let count = parseInt(localStorage.getItem('mag_count')) || 0;
         let goal = parseInt(localStorage.getItem('mag_goal')) || 100;
         let isMuted = localStorage.getItem('mag_mute') === 'true';
 
-        // Audio setup
         let audioCtx;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -150,16 +148,19 @@
             localStorage.setItem('mag_count', count);
         };
 
-        // Tap Logic
+        // Tap Logic FIXED
         document.getElementById('tapBtn').addEventListener('pointerdown', (e) => {
-            initAudio(); // Initialize on first tap
+            initAudio();
             count++;
-            updateUI();
             
+            // Vibration on every tap
             if (navigator.vibrate) navigator.vibrate(40);
 
-            // Target Logic: 3 Tings & Strong Vibration
-            if (count % goal === 0) {
+            // Check if Target reached
+            if (count >= goal) {
+                updateUI(); // Show the last number briefly
+                
+                // Alert Sound & Vibration
                 if (navigator.vibrate) navigator.vibrate([150, 100, 150, 100, 150]);
                 let times = 0;
                 let bell = setInterval(() => {
@@ -167,6 +168,14 @@
                     times++;
                     if (times >= 3) clearInterval(bell);
                 }, 250);
+
+                // Auto-reset to 0 for next round
+                setTimeout(() => {
+                    count = 0;
+                    updateUI();
+                }, 500);
+            } else {
+                updateUI();
             }
         });
 
@@ -179,7 +188,7 @@
 
         document.getElementById('targetBtn').onclick = () => {
             let val = prompt("Target set karein:", goal);
-            if(val && !isNaN(val)) {
+            if(val && !isNaN(val) && val > 0) {
                 goal = parseInt(val);
                 localStorage.setItem('mag_goal', goal);
                 updateUI();
