@@ -15,150 +15,134 @@
             --neon-border: #00d2ff;
         }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body {
             margin: 0; padding: 0;
             display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; width: 100vw;
+            height: 100vh; width: 100vw;
             background-color: var(--app-bg);
-            font-family: 'Segoe UI', sans-serif; color: white;
-            user-select: none; overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            color: white; overflow: hidden;
         }
 
-        @keyframes neonBorderGlow {
-            0% { border-color: #00d2ff; box-shadow: 0 0 20px #00d2ff, inset 0 0 10px #00d2ff; }
-            33% { border-color: #f3ba2f; box-shadow: 0 0 25px #f3ba2f, inset 0 0 10px #f3ba2f; }
-            66% { border-color: #ff00ff; box-shadow: 0 0 25px #ff00ff, inset 0 0 10px #ff00ff; }
-            100% { border-color: #00d2ff; box-shadow: 0 0 20px #00d2ff, inset 0 0 10px #00d2ff; }
-        }
-
-        /* Responsive Frame for all screens */
         .phone-frame {
             background: var(--card-bg);
-            width: 100%; 
-            height: 100vh;
+            width: 100%; height: 100%;
+            max-width: 450px;
             padding: 15px;
             text-align: center;
-            position: relative; 
-            border: 4px solid #1e293b; 
-            animation: neonBorderGlow 5s linear infinite;
-            display: flex;
-            flex-direction: column;
+            border: 4px solid #1e293b;
+            box-shadow: 0 0 20px var(--neon-border);
+            display: flex; flex-direction: column;
             justify-content: space-between;
-            box-sizing: border-box;
         }
 
-        .top-container { display: flex; justify-content: space-between; align-items: center; padding: 5px; }
-        .side-btn { 
-            background: rgba(255,255,255,0.05); 
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white; padding: 8px 12px; border-radius: 12px; font-size: 0.7rem; cursor: pointer;
-            box-shadow: 0 0 5px rgba(0,210,255,0.3);
-        }
-
-        .live-stats {
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            padding: 8px;
-            font-size: 0.75rem;
-            color: var(--text-gray);
-            display: flex;
-            justify-content: space-around;
-            margin: 5px 10px;
+        .stats-bar {
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            padding: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 5px;
+            margin: 10px 0;
             border: 1px solid rgba(0,210,255,0.2);
         }
-        
-        .volume-control { display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .volume-control input { width: 100px; accent-color: var(--gold-glow); }
 
-        .header-stats { display: flex; justify-content: space-between; padding: 0 15px; font-size: 0.9rem; }
-        
-        .ring-container {
-            position: relative; 
-            width: min(220px, 50vw); 
-            height: min(220px, 50vw); 
-            margin: 0 auto;
+        .stat-item { display: flex; flex-direction: column; font-size: 0.65rem; color: var(--text-gray); }
+        .stat-value { font-size: 0.9rem; color: #fff; font-weight: bold; margin-top: 3px; }
+
+        .btn-ui {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white; padding: 8px 12px; border-radius: 10px;
+            font-size: 0.7rem; cursor: pointer;
+        }
+
+        .branding h1 { font-size: 1.4rem; margin: 0; letter-spacing: 1px; }
+        .branding h2 { font-size: 1.5rem; margin: 5px 0; }
+
+        .counter-area {
+            position: relative;
+            width: 180px; height: 180px;
+            margin: 5px auto;
             display: flex; justify-content: center; align-items: center;
         }
 
         .bead {
-            position: absolute; width: 12px; height: 12px;
-            background: radial-gradient(circle at 30% 30%, #fff, var(--bead-color));
-            border-radius: 50%; left: 50%; top: 0; 
-            transform-origin: 50% min(110px, 25vw);
+            position: absolute; width: 10px; height: 10px;
+            background: radial-gradient(circle, #fff, var(--bead-color));
+            border-radius: 50%; left: 50%; top: 0;
+            transform-origin: 50% 90px;
         }
 
-        .total-display { font-size: 4rem; font-weight: 200; margin: 0; z-index: 10; color: #fff; }
-
-        .dhikr-btn {
-            width: 130px; height: 130px; border-radius: 50%; border: 6px solid rgba(255,255,255,0.1);
-            background: radial-gradient(circle at 35% 35%, #fcd34d 0%, #b28924 100%);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
-            cursor: pointer; display: flex; justify-content: center; align-items: center; 
-            margin: 10px auto; outline: none; flex-shrink: 0;
-            transition: transform 0.1s;
+        .main-tap-btn {
+            width: 120px; height: 120px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fcd34d, #b28924);
+            border: 6px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+            margin: 0 auto 10px; transition: 0.1s;
         }
-        .dhikr-btn:active { transform: scale(0.95); }
+        .main-tap-btn:active { transform: scale(0.9); }
 
-        marquee { font-size: 0.8rem; color: var(--text-gray); }
-
-        @media (max-height: 650px) {
-            .total-display { font-size: 3rem; }
-            .dhikr-btn { width: 100px; height: 100px; }
-            .branding-header font { size: 4; }
-        }
+        .volume-box { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 5px;}
+        input[type=range] { width: 100px; accent-color: var(--gold-glow); }
     </style>
 </head>
 <body>
 
     <div class="phone-frame">
-        <div class="top-container">
-            <button class="side-btn" onclick="reset()">RESET</button>
-            <button class="side-btn" onclick="setGoal()">TARGET</button>
+        <div style="display: flex; justify-content: space-between;">
+            <button class="btn-ui" onclick="reset()">RESET</button>
+            <button class="btn-ui" onclick="setGoal()">TARGET</button>
         </div>
 
-        <div class="branding-header">
-            <font size="5">DIVINE BEADS</font>
-            <p style="margin: 5px 0;"><font size="5">پاک تسبیح</font></p>
-            <p style="margin: 0;"><b><font size="3">Powered By M.A.Gohar</font></b></p>
+        <div class="branding">
+            <h1>DIVINE BEADS</h1>
+            <h2>پاک تسبیح</h2>
+            <p style="margin:0; font-size: 0.8rem; color: var(--gold-glow);">Powered By M.A. Gohar</p>
         </div>
 
-        <div class="live-stats">
-            <span>👥 Community: <b id="totalUsers" style="color:#00d2ff">...</b></span>
-            <span>💧 Online: <b id="onlineUsers" style="color:var(--gold-glow)">...</b></span>
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span>Installs</span>
+                <span class="stat-value" id="installCount">...</span>
+            </div>
+            <div class="stat-item">
+                <span>Online</span>
+                <span class="stat-value" id="onlineCount" style="color: #00d2ff;">...</span>
+            </div>
+            <div class="stat-item">
+                <span>Live Recite</span>
+                <span class="stat-value" id="globalCount" style="color: var(--gold-glow);">...</span>
+            </div>
         </div>
 
-        <marquee>Sadaqah-e-Jariyah: Share App And earn the Reward till the time of Qayamah; 100% Secure & Child Safe ! No permissions needed.</marquee>
-
-        <div class="volume-control">
+        <div class="volume-box">
             <span>🔈</span>
             <input type="range" id="volSlider" min="0" max="1" step="0.1" value="0.5">
             <span>🔊</span>
         </div>
 
-        <div class="header-stats">
-            <div style="text-align: left;">
-                Today: <b id="todayCount">0</b><br>
-                <div class="side-btn" id="soundBtn" onclick="toggleSound()" style="padding: 4px 8px; margin-top: 5px;">🔊 On</div>
-            </div>
-            <div style="text-align: right;">
-                Target: <b id="targetLabel">100</b><br>
-                <div class="side-btn" onclick="shareApp()" style="padding: 4px 8px; margin-top: 5px;">🔗 Share</div>
-            </div>
+        <div style="display: flex; justify-content: space-between; padding: 0 15px; font-size: 0.8rem;">
+            <div style="text-align: left;">Today: <b id="todayVal">0</b><br><button class="btn-ui" id="muteBtn" onclick="toggleMute()" style="margin-top:5px;">🔊 On</button></div>
+            <div style="text-align: right;">Goal: <b id="goalVal">100</b><br><button class="btn-ui" onclick="shareApp()" style="margin-top:5px;">🔗 Share</button></div>
         </div>
 
-        <div class="ring-container">
-            <div class="mala-beads-wrap" id="malaWrap" style="position: absolute; width: 100%; height: 100%; transition: transform 0.3s;"></div>
-            <h1 class="total-display" id="mainCounter">0</h1>
+        <div class="counter-area">
+            <div id="malaWrap" style="position: absolute; width: 100%; height: 100%; transition: transform 0.2s;"></div>
+            <div id="displayNum" style="font-size: 4rem; font-weight: 200; z-index: 5;">0</div>
         </div>
 
-        <button class="dhikr-btn" id="tapBtn">
-            <span style="font-size: 1.2rem; color: #4a3700; font-weight: 900;">PRESS</span>
+        <button class="main-tap-btn" id="pressBtn">
+            <b style="color: #4a3700; font-size: 1.2rem;">PRESS</b>
         </button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, onValue, onDisconnect, runTransaction } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getDatabase, ref, onValue, onDisconnect, runTransaction, set } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCqM0KiV0K29BIFLmRoQoX2KUVdtChrwXE",
@@ -173,96 +157,107 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        const totalRef = ref(db, 'stats/total_users');
+        const installRef = ref(db, 'stats/total_installs');
         const onlineRef = ref(db, 'stats/online_now');
+        const globalRef = ref(db, 'stats/global_recite_count');
 
-        // Total Community Logic
-        if (!localStorage.getItem('mag_unique_user')) {
-            runTransaction(totalRef, (curr) => (curr || 0) + 1);
-            localStorage.setItem('mag_unique_user', 'true');
+        // 1. Install Count
+        if (!localStorage.getItem('mag_installed')) {
+            runTransaction(installRef, c => (c || 0) + 1);
+            localStorage.setItem('mag_installed', 'true');
         }
-        onValue(totalRef, (snap) => { document.getElementById('totalUsers').innerText = snap.val() || 0; });
+        onValue(installRef, s => document.getElementById('installCount').innerText = s.val() || 0);
 
-        // Online Users Logic
-        runTransaction(onlineRef, (curr) => (curr || 0) + 1);
-        onDisconnect(onlineRef).runTransaction((curr) => (curr > 0 ? curr - 1 : 0));
-        onValue(onlineRef, (snap) => { document.getElementById('onlineUsers').innerText = snap.val() || 1; });
+        // 2. Online Count
+        runTransaction(onlineRef, c => (c || 0) + 1);
+        onDisconnect(onlineRef).runTransaction(c => (c > 0 ? c - 1 : 0));
+        onValue(onlineRef, s => document.getElementById('onlineCount').innerText = s.val() || 1);
+
+        // 3. Global Recite Logic
+        onValue(globalRef, s => document.getElementById('globalCount').innerText = s.val() || 0);
+
+        window.updateGlobalCount = () => {
+            runTransaction(globalRef, c => (c || 0) + 1);
+        };
     </script>
 
     <script>
         let count = parseInt(localStorage.getItem('mag_count')) || 0;
-        let goal = parseInt(localStorage.getItem('mag_goal')) || 100;
-        let isMuted = localStorage.getItem('mag_mute') === 'true';
-        let appVolume = parseFloat(localStorage.getItem('mag_vol')) || 0.5;
+        let target = parseInt(localStorage.getItem('mag_goal')) || 100;
+        let isMuted = localStorage.getItem('mag_muted') === 'true';
+        let vol = 0.5;
 
-        const mainDisplay = document.getElementById('mainCounter');
-        const volSlider = document.getElementById('volSlider');
-
+        const display = document.getElementById('displayNum');
+        const mala = document.getElementById('malaWrap');
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        function playTargetAlert() {
+
+        function playBeep(delay = 0) {
             if (isMuted) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
-            gain.gain.setValueAtTime(appVolume, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1);
-            osc.start(); osc.stop(audioCtx.currentTime + 1);
-            if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+            setTimeout(() => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.frequency.value = 880;
+                gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+            }, delay);
         }
 
-        function updateUI() {
-            mainDisplay.innerText = count;
-            document.getElementById('todayCount').innerText = count;
-            document.getElementById('targetLabel').innerText = goal;
-            document.getElementById('malaWrap').style.transform = `rotate(-${count * (360/33)}deg)`;
+        function updateView() {
+            display.innerText = count;
+            document.getElementById('todayVal').innerText = count;
+            document.getElementById('goalVal').innerText = target;
+            mala.style.transform = `rotate(-${count * (360/33)}deg)`;
             
-            if (count >= goal && goal > 0) {
-                mainDisplay.style.color = "var(--gold-glow)";
-                if(count === goal) playTargetAlert();
+            if (count >= target && target > 0) {
+                display.style.color = "var(--gold-glow)";
+                if (count === target) {
+                    // Repeat Sound 3 Times
+                    playBeep(0);
+                    playBeep(600);
+                    playBeep(1200);
+                    if(navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
+                }
             } else {
-                mainDisplay.style.color = "#fff";
+                display.style.color = "white";
             }
             localStorage.setItem('mag_count', count);
         }
 
-        volSlider.oninput = () => {
-            appVolume = volSlider.value;
-            localStorage.setItem('mag_vol', appVolume);
+        document.getElementById('pressBtn').onclick = () => {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            count++;
+            updateView();
+            if(window.updateGlobalCount) window.updateGlobalCount(); // Firebase Update
         };
 
-        function toggleSound() {
+        function reset() { if(confirm("Reset Count?")) { count = 0; updateView(); } }
+        function setGoal() { 
+            let v = prompt("Set Target:", target); 
+            if(v) { target = parseInt(v); updateView(); localStorage.setItem('mag_goal', target); } 
+        }
+
+        function toggleMute() {
             isMuted = !isMuted;
-            localStorage.setItem('mag_mute', isMuted);
-            document.getElementById('soundBtn').innerText = isMuted ? '🔇 Off' : '🔊 On';
+            localStorage.setItem('mag_muted', isMuted);
+            document.getElementById('muteBtn').innerText = isMuted ? '🔇 Off' : '🔊 On';
         }
 
         function shareApp() {
-            const text = `Join Divine Beads Community! My count today: ${count}\nApp Link: ${window.location.href}`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-        }
-
-        document.getElementById('tapBtn').onclick = () => {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            count++; updateUI();
-        };
-
-        function reset() { if(confirm("Reset Count?")) { count = 0; updateUI(); } }
-        function setGoal() { 
-            let g = prompt("Set Your Target:", goal); 
-            if(g) { goal = parseInt(g); updateUI(); localStorage.setItem('mag_goal', goal); } 
+            window.open(`https://wa.me/?text=Divine%20Beads%20App%20-%20Recite%20Dhikr%20Together!%20${window.location.href}`);
         }
 
         // Generate Beads
-        const malaWrap = document.getElementById('malaWrap');
         for (let i = 0; i < 33; i++) {
             const b = document.createElement('div');
             b.className = 'bead';
             b.style.transform = `translateX(-50%) rotate(${i * (360/33)}deg)`;
-            malaWrap.appendChild(b);
+            mala.appendChild(b);
         }
-        updateUI();
+
+        document.getElementById('volSlider').oninput = (e) => { vol = e.target.value; };
+        updateView();
     </script>
 </body>
 </html>
