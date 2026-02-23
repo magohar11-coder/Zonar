@@ -6,16 +6,14 @@
     <title>Divine Beads - M.A. Gohar</title>
     <style>
         :root { --app-bg: #030a16; --gold: #f3ba2f; --cyan: #00d2ff; }
-        body { margin: 0; background: var(--app-bg); font-family: sans-serif; color: white; height: 100vh; display: flex; justify-content: center; }
-        .phone-frame { width: 100%; max-width: 450px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; border: 2px solid #1e293b; text-align: center; }
-        
-        /* Stats Styling */
-        .stats-bar { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 15px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; border: 1px solid rgba(0,210,255,0.2); }
-        .stat-val { display: block; font-size: 1.1rem; font-weight: bold; margin-top: 5px; }
-        
-        .bead { position: absolute; width: 10px; height: 10px; background: radial-gradient(circle, #fff, var(--gold)); border-radius: 50%; left: 50%; transform-origin: 50% 95px; }
-        .main-btn { width: 130px; height: 130px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fcd34d, #b28924); border: none; box-shadow: 0 10px 20px rgba(0,0,0,0.5); cursor: pointer; margin: 0 auto; }
-        .btn-ui { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 15px; border-radius: 8px; font-size: 0.7rem; }
+        body { margin: 0; background: var(--app-bg); font-family: sans-serif; color: white; height: 100vh; display: flex; justify-content: center; overflow: hidden; }
+        .phone-frame { width: 100%; max-width: 450px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; border: 2px solid #1e293b; text-align: center; box-shadow: 0 0 20px rgba(0,210,255,0.2); }
+        .stats-bar { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 12px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; border: 1px solid rgba(0,210,255,0.1); }
+        .stat-val { display: block; font-size: 1rem; font-weight: bold; margin-top: 3px; }
+        .bead { position: absolute; width: 10px; height: 10px; background: radial-gradient(circle, #fff, var(--gold)); border-radius: 50%; left: 50%; transform-origin: 50% 90px; }
+        .main-btn { width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fcd34d, #b28924); border: 6px solid rgba(255,255,255,0.1); cursor: pointer; margin: 0 auto; transition: 0.1s; }
+        .main-btn:active { transform: scale(0.9); }
+        .btn-ui { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; }
     </style>
 </head>
 <body>
@@ -27,28 +25,28 @@
     </div>
 
     <div>
-        <h1 style="margin:0; letter-spacing:2px;">DIVINE BEADS</h1>
-        <h2 style="margin:5px 0;">پاک تسبیح</h2>
-        <p style="color: var(--gold); font-size: 0.8rem;">Powered By M.A. Gohar</p>
+        <h1 style="margin:0; font-size: 1.5rem;">DIVINE BEADS</h1>
+        <h2 style="margin:2px 0;">پاک تسبیح</h2>
+        <p style="color: var(--gold); font-size: 0.75rem; margin:0;">Powered By M.A. Gohar</p>
     </div>
 
     <div class="stats-bar">
-        <div><small>Installs</small><span class="stat-val" id="installCount" style="color:white;">0</span></div>
-        <div><small>Online</small><span class="stat-val" id="onlineCount" style="color:var(--cyan);">0</span></div>
-        <div><small>Live Recite</small><span class="stat-val" id="globalCount" style="color:var(--gold);">0</span></div>
+        <div><small style="font-size:0.6rem;">Installs</small><span class="stat-val" id="installCount">0</span></div>
+        <div><small style="font-size:0.6rem;">Online</small><span class="stat-val" id="onlineCount" style="color:var(--cyan);">0</span></div>
+        <div><small style="font-size:0.6rem;">Live Recite</small><span class="stat-val" id="globalCount" style="color:var(--gold);">0</span></div>
     </div>
 
-    <div style="display: flex; justify-content: space-between; padding: 0 20px;">
+    <div style="display: flex; justify-content: space-between; padding: 0 10px; font-size: 0.8rem;">
         <div align="left">Today: <b id="todayVal">0</b><br><button class="btn-ui" id="muteBtn" onclick="toggleMute()" style="margin-top:5px;">🔊 On</button></div>
         <div align="right">Goal: <b id="goalVal">100</b><br><button class="btn-ui" onclick="shareApp()" style="margin-top:5px;">🔗 Share</button></div>
     </div>
 
-    <div style="position: relative; width: 200px; height: 200px; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
+    <div style="position: relative; width: 180px; height: 180px; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
         <div id="mala" style="position: absolute; width: 100%; height: 100%; transition: transform 0.2s;"></div>
-        <div id="displayNum" style="font-size: 4.5rem; font-weight: 200;">0</div>
+        <div id="displayNum" style="font-size: 4rem; font-weight: 200;">0</div>
     </div>
 
-    <button class="main-btn" id="pressBtn"><b style="color: #4a3700; font-size: 1.3rem;">PRESS</b></button>
+    <button class="main-btn" id="pressBtn"><b style="color: #4a3700; font-size: 1.2rem;">PRESS</b></button>
 </div>
 
 <script type="module">
@@ -68,45 +66,47 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Database Refs
     const installRef = ref(db, 'stats/total_installs');
     const onlineRef = ref(db, 'stats/online_now');
     const globalRef = ref(db, 'stats/global_recite_count');
 
-    // Sync Stats
     onValue(installRef, s => document.getElementById('installCount').innerText = s.val() || 0);
-    onValue(onlineRef, s => document.getElementById('onlineCount').innerText = s.val() || 1);
+    onValue(onlineRef, s => document.getElementById('onlineCount').innerText = s.val() || 0);
     onValue(globalRef, s => document.getElementById('globalCount').innerText = s.val() || 0);
 
-    // Increment Installs (One time per device)
-    if(!localStorage.getItem('mag_id')){
+    // One-time install count logic
+    if(!localStorage.getItem('mag_user_id')){
         runTransaction(installRef, c => (c || 0) + 1);
-        localStorage.setItem('mag_id', 'user_' + Math.random());
+        localStorage.setItem('mag_user_id', 'v1_' + Date.now());
     }
 
-    // Online Tracking
-    runTransaction(onlineRef, c => (c || 0) + 1);
-    onDisconnect(onlineRef).runTransaction(c => (c > 0 ? c - 1 : 0));
+    // Fixed Online Tracking (Prevents duplicate counting on refresh)
+    if(!sessionStorage.getItem('is_counted')){
+        runTransaction(onlineRef, c => (c || 0) + 1);
+        sessionStorage.setItem('is_counted', 'true');
+        onDisconnect(onlineRef).runTransaction(c => (c > 0 ? c - 1 : 0));
+    }
 
-    // Global Click Function
     window.logClick = () => { runTransaction(globalRef, c => (c || 0) + 1); };
 </script>
 
 <script>
     let count = parseInt(localStorage.getItem('mag_cnt')) || 0;
     let target = parseInt(localStorage.getItem('mag_trg')) || 100;
-    let muted = localStorage.getItem('mag_mute') === 'true';
-    const audio = new (window.AudioContext || window.webkitAudioContext)();
+    let muted = false;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    function playBeep(time) {
+    function playBeep(delay) {
         if(muted) return;
-        const osc = audio.createOscillator();
-        const g = audio.createGain();
-        osc.connect(g); g.connect(audio.destination);
-        osc.frequency.value = 880;
-        g.gain.setValueAtTime(0.1, audio.currentTime + time);
-        g.gain.exponentialRampToValueAtTime(0.01, audio.currentTime + time + 0.4);
-        osc.start(audio.currentTime + time); osc.stop(audio.currentTime + time + 0.4);
+        setTimeout(() => {
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.connect(g); g.connect(audioCtx.destination);
+            osc.frequency.value = 880;
+            g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+        }, delay);
     }
 
     function update() {
@@ -116,22 +116,22 @@
         document.getElementById('mala').style.transform = `rotate(-${count * 10.9}deg)`;
         
         if(count == target && target > 0) {
-            playBeep(0); playBeep(0.5); playBeep(1.0); // 3 Times Repeat
+            playBeep(0); playBeep(500); playBeep(1000); // 3 Times
             if(navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
         }
         localStorage.setItem('mag_cnt', count);
     }
 
     document.getElementById('pressBtn').onclick = () => {
-        if(audio.state === 'suspended') audio.resume();
+        if(audioCtx.state === 'suspended') audioCtx.resume();
         count++; update();
         if(window.logClick) window.logClick();
     };
 
-    function reset() { if(confirm("Reset?")) { count = 0; update(); } }
-    function setGoal() { let v = prompt("Target:", target); if(v) { target = parseInt(v); update(); localStorage.setItem('mag_trg', target); } }
-    function toggleMute() { muted = !muted; localStorage.setItem('mag_mute', muted); document.getElementById('muteBtn').innerText = muted ? '🔇 Off' : '🔊 On'; }
-    function shareApp() { window.open(`https://wa.me/?text=Dhikr Count: ${count}. Join: ${window.location.href}`); }
+    function reset() { if(confirm("Reset Count?")) { count = 0; update(); } }
+    function setGoal() { let v = prompt("Set Target:", target); if(v) { target = parseInt(v); update(); localStorage.setItem('mag_trg', target); } }
+    function toggleMute() { muted = !muted; document.getElementById('muteBtn').innerText = muted ? '🔇 Off' : '🔊 On'; }
+    function shareApp() { window.open(`https://wa.me/?text=My Dhikr Count: ${count}. Join me: ${window.location.href}`); }
 
     const mala = document.getElementById('mala');
     for(let i=0; i<33; i++) {
