@@ -4,260 +4,142 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Divine Beads - M.A. Gohar</title>
-    <meta name="theme-color" content="#030a16">
     <style>
-        :root {
-            --app-bg: #030a16;
-            --card-bg: radial-gradient(circle, #0a192f 0%, #02060c 100%);
-            --gold-glow: #f3ba2f;
-            --bead-color: #ffd700;
-            --text-gray: #94a3b8;
-            --neon-border: #00d2ff;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            margin: 0; padding: 0;
-            display: flex; justify-content: center; align-items: center;
-            height: 100vh; width: 100vw;
-            background-color: var(--app-bg);
-            font-family: 'Segoe UI', sans-serif;
-            color: white; overflow: hidden;
-        }
-
-        .phone-frame {
-            background: var(--card-bg);
-            width: 100%; height: 100%;
-            max-width: 450px;
-            padding: 15px;
-            text-align: center;
-            border: 4px solid #1e293b;
-            box-shadow: 0 0 20px var(--neon-border);
-            display: flex; flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .stats-bar {
-            background: rgba(0,0,0,0.4);
-            border-radius: 15px;
-            padding: 12px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 5px;
-            margin: 10px 0;
-            border: 1px solid rgba(0,210,255,0.2);
-        }
-
-        .stat-item { display: flex; flex-direction: column; font-size: 0.65rem; color: var(--text-gray); }
-        .stat-value { font-size: 0.9rem; color: #fff; font-weight: bold; margin-top: 3px; }
-
-        .btn-ui {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white; padding: 8px 12px; border-radius: 10px;
-            font-size: 0.7rem; cursor: pointer;
-        }
-
-        .branding h1 { font-size: 1.4rem; margin: 0; letter-spacing: 1px; }
-        .branding h2 { font-size: 1.5rem; margin: 5px 0; }
-
-        .counter-area {
-            position: relative;
-            width: 180px; height: 180px;
-            margin: 5px auto;
-            display: flex; justify-content: center; align-items: center;
-        }
-
-        .bead {
-            position: absolute; width: 10px; height: 10px;
-            background: radial-gradient(circle, #fff, var(--bead-color));
-            border-radius: 50%; left: 50%; top: 0;
-            transform-origin: 50% 90px;
-        }
-
-        .main-tap-btn {
-            width: 120px; height: 120px; border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #fcd34d, #b28924);
-            border: 6px solid rgba(255,255,255,0.1);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            cursor: pointer; display: flex; justify-content: center; align-items: center;
-            margin: 0 auto 10px; transition: 0.1s;
-        }
-        .main-tap-btn:active { transform: scale(0.9); }
-
-        .volume-box { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 5px;}
-        input[type=range] { width: 100px; accent-color: var(--gold-glow); }
+        :root { --app-bg: #030a16; --gold: #f3ba2f; --cyan: #00d2ff; }
+        body { margin: 0; background: var(--app-bg); font-family: sans-serif; color: white; height: 100vh; display: flex; justify-content: center; }
+        .phone-frame { width: 100%; max-width: 450px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; border: 2px solid #1e293b; text-align: center; }
+        
+        /* Stats Styling */
+        .stats-bar { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 15px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; border: 1px solid rgba(0,210,255,0.2); }
+        .stat-val { display: block; font-size: 1.1rem; font-weight: bold; margin-top: 5px; }
+        
+        .bead { position: absolute; width: 10px; height: 10px; background: radial-gradient(circle, #fff, var(--gold)); border-radius: 50%; left: 50%; transform-origin: 50% 95px; }
+        .main-btn { width: 130px; height: 130px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fcd34d, #b28924); border: none; box-shadow: 0 10px 20px rgba(0,0,0,0.5); cursor: pointer; margin: 0 auto; }
+        .btn-ui { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 15px; border-radius: 8px; font-size: 0.7rem; }
     </style>
 </head>
 <body>
 
-    <div class="phone-frame">
-        <div style="display: flex; justify-content: space-between;">
-            <button class="btn-ui" onclick="reset()">RESET</button>
-            <button class="btn-ui" onclick="setGoal()">TARGET</button>
-        </div>
-
-        <div class="branding">
-            <h1>DIVINE BEADS</h1>
-            <h2>پاک تسبیح</h2>
-            <p style="margin:0; font-size: 0.8rem; color: var(--gold-glow);">Powered By M.A. Gohar</p>
-        </div>
-
-        <div class="stats-bar">
-            <div class="stat-item">
-                <span>Installs</span>
-                <span class="stat-value" id="installCount">...</span>
-            </div>
-            <div class="stat-item">
-                <span>Online</span>
-                <span class="stat-value" id="onlineCount" style="color: #00d2ff;">...</span>
-            </div>
-            <div class="stat-item">
-                <span>Live Recite</span>
-                <span class="stat-value" id="globalCount" style="color: var(--gold-glow);">...</span>
-            </div>
-        </div>
-
-        <div class="volume-box">
-            <span>🔈</span>
-            <input type="range" id="volSlider" min="0" max="1" step="0.1" value="0.5">
-            <span>🔊</span>
-        </div>
-
-        <div style="display: flex; justify-content: space-between; padding: 0 15px; font-size: 0.8rem;">
-            <div style="text-align: left;">Today: <b id="todayVal">0</b><br><button class="btn-ui" id="muteBtn" onclick="toggleMute()" style="margin-top:5px;">🔊 On</button></div>
-            <div style="text-align: right;">Goal: <b id="goalVal">100</b><br><button class="btn-ui" onclick="shareApp()" style="margin-top:5px;">🔗 Share</button></div>
-        </div>
-
-        <div class="counter-area">
-            <div id="malaWrap" style="position: absolute; width: 100%; height: 100%; transition: transform 0.2s;"></div>
-            <div id="displayNum" style="font-size: 4rem; font-weight: 200; z-index: 5;">0</div>
-        </div>
-
-        <button class="main-tap-btn" id="pressBtn">
-            <b style="color: #4a3700; font-size: 1.2rem;">PRESS</b>
-        </button>
+<div class="phone-frame">
+    <div style="display: flex; justify-content: space-between;">
+        <button class="btn-ui" onclick="reset()">RESET</button>
+        <button class="btn-ui" onclick="setGoal()">TARGET</button>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, onValue, onDisconnect, runTransaction, set } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+    <div>
+        <h1 style="margin:0; letter-spacing:2px;">DIVINE BEADS</h1>
+        <h2 style="margin:5px 0;">پاک تسبیح</h2>
+        <p style="color: var(--gold); font-size: 0.8rem;">Powered By M.A. Gohar</p>
+    </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCqM0KiV0K29BIFLmRoQoX2KUVdtChrwXE",
-            authDomain: "divine-beads.firebaseapp.com",
-            databaseURL: "https://divine-beads-default-rtdb.firebaseio.com",
-            projectId: "divine-beads",
-            storageBucket: "divine-beads.firebasestorage.app",
-            messagingSenderId: "589482198444",
-            appId: "1:589482198444:web:1a3343eea6ef775fd4a609"
-        };
+    <div class="stats-bar">
+        <div><small>Installs</small><span class="stat-val" id="installCount" style="color:white;">0</span></div>
+        <div><small>Online</small><span class="stat-val" id="onlineCount" style="color:var(--cyan);">0</span></div>
+        <div><small>Live Recite</small><span class="stat-val" id="globalCount" style="color:var(--gold);">0</span></div>
+    </div>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+    <div style="display: flex; justify-content: space-between; padding: 0 20px;">
+        <div align="left">Today: <b id="todayVal">0</b><br><button class="btn-ui" id="muteBtn" onclick="toggleMute()" style="margin-top:5px;">🔊 On</button></div>
+        <div align="right">Goal: <b id="goalVal">100</b><br><button class="btn-ui" onclick="shareApp()" style="margin-top:5px;">🔗 Share</button></div>
+    </div>
 
-        const installRef = ref(db, 'stats/total_installs');
-        const onlineRef = ref(db, 'stats/online_now');
-        const globalRef = ref(db, 'stats/global_recite_count');
+    <div style="position: relative; width: 200px; height: 200px; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
+        <div id="mala" style="position: absolute; width: 100%; height: 100%; transition: transform 0.2s;"></div>
+        <div id="displayNum" style="font-size: 4.5rem; font-weight: 200;">0</div>
+    </div>
 
-        // 1. Install Count
-        if (!localStorage.getItem('mag_installed')) {
-            runTransaction(installRef, c => (c || 0) + 1);
-            localStorage.setItem('mag_installed', 'true');
+    <button class="main-btn" id="pressBtn"><b style="color: #4a3700; font-size: 1.3rem;">PRESS</b></button>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getDatabase, ref, onValue, onDisconnect, runTransaction } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCqM0KiV0K29BIFLmRoQoX2KUVdtChrwXE",
+        authDomain: "divine-beads.firebaseapp.com",
+        databaseURL: "https://divine-beads-default-rtdb.firebaseio.com",
+        projectId: "divine-beads",
+        storageBucket: "divine-beads.firebasestorage.app",
+        messagingSenderId: "589482198444",
+        appId: "1:589482198444:web:1a3343eea6ef775fd4a609"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Database Refs
+    const installRef = ref(db, 'stats/total_installs');
+    const onlineRef = ref(db, 'stats/online_now');
+    const globalRef = ref(db, 'stats/global_recite_count');
+
+    // Sync Stats
+    onValue(installRef, s => document.getElementById('installCount').innerText = s.val() || 0);
+    onValue(onlineRef, s => document.getElementById('onlineCount').innerText = s.val() || 1);
+    onValue(globalRef, s => document.getElementById('globalCount').innerText = s.val() || 0);
+
+    // Increment Installs (One time per device)
+    if(!localStorage.getItem('mag_id')){
+        runTransaction(installRef, c => (c || 0) + 1);
+        localStorage.setItem('mag_id', 'user_' + Math.random());
+    }
+
+    // Online Tracking
+    runTransaction(onlineRef, c => (c || 0) + 1);
+    onDisconnect(onlineRef).runTransaction(c => (c > 0 ? c - 1 : 0));
+
+    // Global Click Function
+    window.logClick = () => { runTransaction(globalRef, c => (c || 0) + 1); };
+</script>
+
+<script>
+    let count = parseInt(localStorage.getItem('mag_cnt')) || 0;
+    let target = parseInt(localStorage.getItem('mag_trg')) || 100;
+    let muted = localStorage.getItem('mag_mute') === 'true';
+    const audio = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playBeep(time) {
+        if(muted) return;
+        const osc = audio.createOscillator();
+        const g = audio.createGain();
+        osc.connect(g); g.connect(audio.destination);
+        osc.frequency.value = 880;
+        g.gain.setValueAtTime(0.1, audio.currentTime + time);
+        g.gain.exponentialRampToValueAtTime(0.01, audio.currentTime + time + 0.4);
+        osc.start(audio.currentTime + time); osc.stop(audio.currentTime + time + 0.4);
+    }
+
+    function update() {
+        document.getElementById('displayNum').innerText = count;
+        document.getElementById('todayVal').innerText = count;
+        document.getElementById('goalVal').innerText = target;
+        document.getElementById('mala').style.transform = `rotate(-${count * 10.9}deg)`;
+        
+        if(count == target && target > 0) {
+            playBeep(0); playBeep(0.5); playBeep(1.0); // 3 Times Repeat
+            if(navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
         }
-        onValue(installRef, s => document.getElementById('installCount').innerText = s.val() || 0);
+        localStorage.setItem('mag_cnt', count);
+    }
 
-        // 2. Online Count
-        runTransaction(onlineRef, c => (c || 0) + 1);
-        onDisconnect(onlineRef).runTransaction(c => (c > 0 ? c - 1 : 0));
-        onValue(onlineRef, s => document.getElementById('onlineCount').innerText = s.val() || 1);
+    document.getElementById('pressBtn').onclick = () => {
+        if(audio.state === 'suspended') audio.resume();
+        count++; update();
+        if(window.logClick) window.logClick();
+    };
 
-        // 3. Global Recite Logic
-        onValue(globalRef, s => document.getElementById('globalCount').innerText = s.val() || 0);
+    function reset() { if(confirm("Reset?")) { count = 0; update(); } }
+    function setGoal() { let v = prompt("Target:", target); if(v) { target = parseInt(v); update(); localStorage.setItem('mag_trg', target); } }
+    function toggleMute() { muted = !muted; localStorage.setItem('mag_mute', muted); document.getElementById('muteBtn').innerText = muted ? '🔇 Off' : '🔊 On'; }
+    function shareApp() { window.open(`https://wa.me/?text=Dhikr Count: ${count}. Join: ${window.location.href}`); }
 
-        window.updateGlobalCount = () => {
-            runTransaction(globalRef, c => (c || 0) + 1);
-        };
-    </script>
-
-    <script>
-        let count = parseInt(localStorage.getItem('mag_count')) || 0;
-        let target = parseInt(localStorage.getItem('mag_goal')) || 100;
-        let isMuted = localStorage.getItem('mag_muted') === 'true';
-        let vol = 0.5;
-
-        const display = document.getElementById('displayNum');
-        const mala = document.getElementById('malaWrap');
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-        function playBeep(delay = 0) {
-            if (isMuted) return;
-            setTimeout(() => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.frequency.value = 880;
-                gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.5);
-            }, delay);
-        }
-
-        function updateView() {
-            display.innerText = count;
-            document.getElementById('todayVal').innerText = count;
-            document.getElementById('goalVal').innerText = target;
-            mala.style.transform = `rotate(-${count * (360/33)}deg)`;
-            
-            if (count >= target && target > 0) {
-                display.style.color = "var(--gold-glow)";
-                if (count === target) {
-                    // Repeat Sound 3 Times
-                    playBeep(0);
-                    playBeep(600);
-                    playBeep(1200);
-                    if(navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
-                }
-            } else {
-                display.style.color = "white";
-            }
-            localStorage.setItem('mag_count', count);
-        }
-
-        document.getElementById('pressBtn').onclick = () => {
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-            count++;
-            updateView();
-            if(window.updateGlobalCount) window.updateGlobalCount(); // Firebase Update
-        };
-
-        function reset() { if(confirm("Reset Count?")) { count = 0; updateView(); } }
-        function setGoal() { 
-            let v = prompt("Set Target:", target); 
-            if(v) { target = parseInt(v); updateView(); localStorage.setItem('mag_goal', target); } 
-        }
-
-        function toggleMute() {
-            isMuted = !isMuted;
-            localStorage.setItem('mag_muted', isMuted);
-            document.getElementById('muteBtn').innerText = isMuted ? '🔇 Off' : '🔊 On';
-        }
-
-        function shareApp() {
-            window.open(`https://wa.me/?text=Divine%20Beads%20App%20-%20Recite%20Dhikr%20Together!%20${window.location.href}`);
-        }
-
-        // Generate Beads
-        for (let i = 0; i < 33; i++) {
-            const b = document.createElement('div');
-            b.className = 'bead';
-            b.style.transform = `translateX(-50%) rotate(${i * (360/33)}deg)`;
-            mala.appendChild(b);
-        }
-
-        document.getElementById('volSlider').oninput = (e) => { vol = e.target.value; };
-        updateView();
-    </script>
+    const mala = document.getElementById('mala');
+    for(let i=0; i<33; i++) {
+        let b = document.createElement('div'); b.className = 'bead';
+        b.style.transform = `translateX(-50%) rotate(${i * 10.9}deg)`;
+        mala.appendChild(b);
+    }
+    update();
+</script>
 </body>
 </html>
